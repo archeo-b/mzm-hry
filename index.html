@@ -78,7 +78,7 @@
             text-align: center;
         }
 
-        /* Oblast hrobu s lokálním obrázkem pozadí */
+        /* Oblast hrobu s pozadím */
         .grave-area {
             flex: 1;
             background-color: #14100e;
@@ -91,7 +91,6 @@
             overflow: hidden;
         }
 
-        /* Lokální soubory pozadí hrobů */
         #male-grave {
             background-image: url('hrob-muz.png');
         }
@@ -163,11 +162,11 @@
             width: 100%;
         }
 
-        /* Předmět po vhození do hrobu - přichycený na anatomické pozici */
+        /* Jakmile je v hrobě, skryjeme textový název, zvětšíme ikonku a přichytíme pozici */
         .grave-area .item {
             position: absolute;
-            width: 65px;
-            height: 65px;
+            width: 60px;
+            height: 60px;
             min-width: unset;
             background-color: rgba(30, 24, 20, 0.9);
             border-color: var(--correct-color);
@@ -175,20 +174,26 @@
             transform: translate(-50%, -50%);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            padding: 6px;
         }
 
         .grave-area .item img {
-            max-height: 35px;
+            max-height: 100%;
+            max-width: 100%;
         }
 
-        /* Výherní modal */
+        .grave-area .item .name {
+            display: none; /* Skryje nápis po umístění do hrobu */
+        }
+
+        /* Obecné modální okno (info / výhra) */
         .modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: rgba(0, 0, 0, 0.85);
+            background-color: rgba(0, 0, 0, 0.8);
             display: none;
             justify-content: center;
             align-items: center;
@@ -202,6 +207,8 @@
             border-radius: 16px;
             text-align: center;
             max-width: 500px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
         }
 
         .modal-content h2 {
@@ -209,14 +216,31 @@
             margin-top: 0;
         }
 
-        .modal-content button {
+        .modal-content p {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            color: var(--text-light);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--accent-gold);
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+        .modal-content button.action-btn {
             background-color: var(--accent-gold);
             color: #000;
             border: none;
-            padding: 12px 28px;
-            font-size: 1.1rem;
+            padding: 10px 24px;
+            font-size: 1rem;
             font-weight: bold;
-            border-radius: 25px;
+            border-radius: 20px;
             cursor: pointer;
             margin-top: 15px;
         }
@@ -226,7 +250,7 @@
 
     <header>
         <h1>Sestav keltský hrob</h1>
-        <p>Přetáhni artefakty kamkoliv do hrobu – samy zapadnou na své anatomické místo.</p>
+        <p>Přetáhni artefakty do hrobu – po správném umístění se dozvíš zajímavosti.</p>
     </header>
 
     <div class="game-board">
@@ -249,34 +273,52 @@
         <div class="items-pool" id="pool"></div>
     </div>
 
+    <!-- Informační okno o předmětu -->
+    <div class="modal" id="info-modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeInfoModal()">&times;</button>
+            <h2 id="info-title">Název předmětu</h2>
+            <p id="info-text">Zde bude text o předmětu...</p>
+            <button class="action-btn" onclick="closeInfoModal()">Pokračovat</button>
+        </div>
+    </div>
+
     <!-- Výherní okno -->
     <div class="modal" id="win-modal">
         <div class="modal-content">
             <h2>Hrobová výbava je kompletní!</h2>
-            <p>Skvělá práce! Správně jsi uložil všechny artefakty na tělo zemřelého podle moravských nálezů.</p>
-            <button onclick="resetGame()">Nová hra</button>
+            <p>Skvělá práce! Úspěšně jsi uložil všechny artefakty na tělo zemřelého podle moravských archeologických nálezů.</p>
+            <button class="action-btn" onclick="resetGame()">Nová hra</button>
         </div>
     </div>
 
     <script>
-        // Seznam předmětů, jejich souborů a anatomických souřadnic v %
+        // Seznam předmětů včetně informací do vyskakovacího okna
         const itemsData = [
-            // Mužské předměty
-            { id: 'mec', name: 'Meč', img: 'mec.png', target: 'male', posX: '65%', posY: '55%' },
-            { id: 'stit', name: 'Štít', img: 'stit.png', target: 'male', posX: '30%', posY: '50%' },
-            { id: 'opasek-muz', name: 'Opasek', img: 'opasek-muz.png', target: 'male', posX: '50%', posY: '52%' },
-            { id: 'spona-muz', name: 'Spona', img: 'spona-muz.png', target: 'male', posX: '50%', posY: '32%' },
+            { id: 'mec', name: 'Meč', img: 'mec.png', target: 'male', posX: '65%', posY: '55%', 
+              info: 'Dlouhé železné meče v kovaných pochvách byly hlavní výzbrojí keltských bojovníků. Často byly do hrobu rituálně ohnuty, aby „zemřely“ spolu se svým majitelem.' },
+            { id: 'stit', name: 'Štít', img: 'stit.png', target: 'male', posX: '30%', posY: '50%', 
+              info: 'Dřevěné štíty s kovovou středovou záštitou (umbonem) poskytovaly keltským bojovníkům ochranu v bojích. Na Moravě se nacházejí právě tyto bronzové nebo železné umbony.' },
+            { id: 'opasek-muz', name: 'Opasek', img: 'opasek-muz.png', target: 'male', posX: '50%', posY: '52%', 
+              info: 'Bohatě zdobené kovové opasky z kroužků či destiček držely oděv bojovníka a sloužily také jako podpora pro zavěšení meče.' },
+            { id: 'spona-muz', name: 'Spona', img: 'spona-muz.png', target: 'male', posX: '50%', posY: '32%', 
+              info: 'Fibule (spony) fungovaly jako  antický „zavírací špendlík“ na sepnutí pláště či tuniky. U mužů se často nacházejí na hrudi nebo rameni.' },
             
-            // Ženské předměty
-            { id: 'nakrcnik', name: 'Nákrčník', img: 'nakrcnik.png', target: 'female', posX: '50%', posY: '22%' },
-            { id: 'spona-zena', name: 'Spony', img: 'spona-zena.png', target: 'female', posX: '50%', posY: '32%' },
-            { id: 'opasek-zena', name: 'Opasek', img: 'opasek-zena.png', target: 'female', posX: '50%', posY: '55%' },
-            { id: 'bronz-naramek', name: 'Náramky', img: 'bronz-naramek.png', target: 'female', posX: '32%', posY: '45%' },
-            { id: 'nanoznik', name: 'Nánožník', img: 'nanoznik.png', target: 'female', posX: '50%', posY: '85%' },
-            { id: 'preslen', name: 'Přeslen', img: 'preslen.png', target: 'female', posX: '75%', posY: '65%' },
+            { id: 'nakrcnik', name: 'Nákrčník', img: 'nakrcnik.png', target: 'female', posX: '50%', posY: '22%', 
+              info: 'Torques (nákrčník) byl symbolem vysokého společenského postavení, moci a bohatství. Nosili ho muži i ženy z keltské elity.' },
+            { id: 'spona-zena', name: 'Spony', img: 'spona-zena.png', target: 'female', posX: '50%', posY: '32%', 
+              info: 'Ženy nosívaly páry ozdobných spon na obou ramenech k sepnutí svrchního šatu (peplosu).' },
+            { id: 'opasek-zena', name: 'Opasek', img: 'opasek-zena.png', target: 'female', posX: '50%', posY: '55%', 
+              info: 'Ženské opasky byly často ozdobeny řetízkem, bronzovými přívěsky nebo kovanými kováními.' },
+            { id: 'bronz-naramek', name: 'Náramky', img: 'bronz-naramek.png', target: 'female', posX: '32%', posY: '45%', 
+              info: 'Duté nebo masivní bronzové náramky (např. typu švarcvaldského) patřily k běžné a velmi oblíbené ženské parádě.' },
+            { id: 'nanoznik', name: 'Nánožník', img: 'nanoznik.png', target: 'female', posX: '50%', posY: '85%', 
+              info: 'Nánožníky (kroužky na kotníky) se na Moravě objevují v mladší době laténské jako specifický módní doplněk.' },
+            { id: 'preslen', name: 'Přeslen', img: 'preslen.png', target: 'female', posX: '75%', posY: '65%', 
+              info: 'Malé hliněné nebo kamenné setrvačníky sloužily k ručnímu předení nití na vřetenu – důkaz každodenní domácí práce keltských žen.' },
 
-            // Univerzální předmět
-            { id: 'keramika', name: 'Keramika', img: 'keramika.png', target: 'both', posX: '75%', posY: '80%' }
+            { id: 'keramika', name: 'Keramika', img: 'keramika.png', target: 'both', posX: '75%', posY: '80%', 
+              info: 'Hliněné nádoby (hrnce, misky, koflíky) v hrobech obsahovaly potraviny a nápoje jako zásobu na cestu zemřelého na onen svět.' }
         ];
 
         let draggedItem = null;
@@ -290,8 +332,8 @@
             pool.innerHTML = '';
             score = 0;
             document.getElementById('win-modal').style.display = 'none';
+            document.getElementById('info-modal').style.display = 'none';
 
-            // Zamíchání nabídky předmětů
             const shuffledItems = [...itemsData].sort(() => Math.random() - 0.5);
 
             shuffledItems.forEach(item => {
@@ -302,19 +344,21 @@
                 el.dataset.target = item.target;
                 el.dataset.posX = item.posX;
                 el.dataset.posY = item.posY;
+                el.dataset.name = item.name;
+                el.dataset.info = item.info;
 
                 el.innerHTML = `
                     <img src="${item.img}" alt="${item.name}" onerror="this.style.display='none'">
                     <div class="name">${item.name}</div>
                 `;
 
-                // Podpora pro myš
+                // Myš
                 el.addEventListener('dragstart', (e) => {
                     draggedItem = el;
                     e.dataTransfer.setData('text/plain', el.id);
                 });
 
-                // Podpora pro dotykové obrazovky
+                // Dotyk na obrazovce
                 el.addEventListener('touchstart', (e) => {
                     draggedItem = el;
                     el.style.position = 'fixed';
@@ -346,7 +390,6 @@
             });
         }
 
-        // Drag & Drop zóny pro myš
         document.querySelectorAll('.grave-area').forEach(area => {
             area.addEventListener('dragover', (e) => e.preventDefault());
             area.addEventListener('drop', (e) => {
@@ -365,24 +408,39 @@
                 graveArea.appendChild(item);
                 item.setAttribute('draggable', 'false');
                 
-                // Přichycení na přesnou anatomickou pozici
+                // Přichycení na anatomickou pozici
                 item.style.left = item.dataset.posX;
                 item.style.top = item.dataset.posY;
                 
                 score++;
 
-                if (score === totalItems) {
-                    setTimeout(() => {
-                        document.getElementById('win-modal').style.display = 'flex';
-                    }, 500);
-                }
+                // Zobrazení informačního okna o předmětu
+                showInfoModal(item.dataset.name, item.dataset.info);
+
             } else {
-                // Špatné umístění - animace odmítnutí
+                // Špatné umístění
                 item.style.borderColor = 'var(--error-color)';
                 setTimeout(() => {
                     item.style.borderColor = 'var(--accent-gold)';
                     item.style.position = 'static';
                     document.getElementById('pool').appendChild(item);
+                }, 300);
+            }
+        }
+
+        function showInfoModal(title, text) {
+            document.getElementById('info-title').innerText = title;
+            document.getElementById('info-text').innerText = text;
+            document.getElementById('info-modal').style.display = 'flex';
+        }
+
+        function closeInfoModal() {
+            document.getElementById('info-modal').style.display = 'none';
+
+            // Po zavření info okna zkontrolujeme, zda už je hotovo
+            if (score === totalItems) {
+                setTimeout(() => {
+                    document.getElementById('win-modal').style.display = 'flex';
                 }, 300);
             }
         }
