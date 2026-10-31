@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sestav keltský hrob - Anatomické uspořádání</title>
+    <title>Sestav keltský hrob - Moravská archeologie</title>
     <style>
         :root {
             --bg-color: #1a1614;
@@ -78,7 +78,7 @@
             text-align: center;
         }
 
-        /* Oblast hrobu s pozadím siluety/kostry */
+        /* Oblast hrobu s lokálním obrázkem pozadí */
         .grave-area {
             flex: 1;
             background-color: #14100e;
@@ -87,17 +87,17 @@
             background-repeat: no-repeat;
             border-radius: 8px;
             border: 2px dashed #4a3d31;
-            position: relative; /* Klíčové pro absolutní pozicování předmětů uvnitř */
+            position: relative;
             overflow: hidden;
         }
 
-        /* Odkazy na vaše obrázky pozadí hrobů */
+        /* Lokální soubory pozadí hrobů */
         #male-grave {
-            /* background-image: url('hrob-muz.png'); */
+            background-image: url('hrob-muz.png');
         }
 
         #female-grave {
-            /* background-image: url('hrob-zena.png'); */
+            background-image: url('hrob-zena.png');
         }
 
         /* Spodní zásobník artefaktů */
@@ -163,7 +163,7 @@
             width: 100%;
         }
 
-        /* Jakmile je předmět umístěný v hrobě, zafixuje se na absolutní pozici */
+        /* Předmět po vhození do hrobu - přichycený na anatomické pozici */
         .grave-area .item {
             position: absolute;
             width: 65px;
@@ -172,8 +172,8 @@
             background-color: rgba(30, 24, 20, 0.9);
             border-color: var(--correct-color);
             cursor: default;
-            transform: translate(-50%, -50%); /* Aby střed předmětu odpovídal souřadnicím */
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Hladké zaklapnutí */
+            transform: translate(-50%, -50%);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
 
@@ -226,7 +226,7 @@
 
     <header>
         <h1>Sestav keltský hrob</h1>
-        <p>Přetáhni artefakty do správného hrobu – samy zapadnou na své anatomické místo.</p>
+        <p>Přetáhni artefakty kamkoliv do hrobu – samy zapadnou na své anatomické místo.</p>
     </header>
 
     <div class="game-board">
@@ -245,7 +245,7 @@
 
     <!-- Zásobník prvků -->
     <div class="inventory-panel">
-        <h3>Nalezené artefakty (přetáhni kamkoliv do odpovídajícího hrobu):</h3>
+        <h3>Nalezené artefakty:</h3>
         <div class="items-pool" id="pool"></div>
     </div>
 
@@ -253,16 +253,13 @@
     <div class="modal" id="win-modal">
         <div class="modal-content">
             <h2>Hrobová výbava je kompletní!</h2>
-            <p>Skvělá práce! Správně jsi uložil všechny artefakty na tělo zemřelého.</p>
+            <p>Skvělá práce! Správně jsi uložil všechny artefakty na tělo zemřelého podle moravských nálezů.</p>
             <button onclick="resetGame()">Nová hra</button>
         </div>
     </div>
 
     <script>
-        /* 
-          Definice předmětů a jejich anatomických pozic (v procentech % od levého a horního okraje hrobu).
-          Můžete si tyto souřadnice snadno upravit podle toho, jak vypadá váš obrázek pozadí siluety!
-        */
+        // Seznam předmětů, jejich souborů a anatomických souřadnic v %
         const itemsData = [
             // Mužské předměty
             { id: 'mec', name: 'Meč', img: 'mec.png', target: 'male', posX: '65%', posY: '55%' },
@@ -278,7 +275,7 @@
             { id: 'nanoznik', name: 'Nánožník', img: 'nanoznik.png', target: 'female', posX: '50%', posY: '85%' },
             { id: 'preslen', name: 'Přeslen', img: 'preslen.png', target: 'female', posX: '75%', posY: '65%' },
 
-            // Univerzální předměty (mohou jít do obou hrobů - zde umístěné např. k nohám / do výbavy)
+            // Univerzální předmět
             { id: 'keramika', name: 'Keramika', img: 'keramika.png', target: 'both', posX: '75%', posY: '80%' }
         ];
 
@@ -294,6 +291,7 @@
             score = 0;
             document.getElementById('win-modal').style.display = 'none';
 
+            // Zamíchání nabídky předmětů
             const shuffledItems = [...itemsData].sort(() => Math.random() - 0.5);
 
             shuffledItems.forEach(item => {
@@ -306,17 +304,17 @@
                 el.dataset.posY = item.posY;
 
                 el.innerHTML = `
-                    <img src="${item.img}" alt="${item.name}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\'><rect width=\'40\' height=\'40\' fill=\'%23555\'/></svg>'">
+                    <img src="${item.img}" alt="${item.name}" onerror="this.style.display='none'">
                     <div class="name">${item.name}</div>
                 `;
 
-                // Myš
+                // Podpora pro myš
                 el.addEventListener('dragstart', (e) => {
                     draggedItem = el;
                     e.dataTransfer.setData('text/plain', el.id);
                 });
 
-                // Dotyk na obrazovce
+                // Podpora pro dotykové obrazovky
                 el.addEventListener('touchstart', (e) => {
                     draggedItem = el;
                     el.style.position = 'fixed';
@@ -348,7 +346,7 @@
             });
         }
 
-        // Zóny pro myš
+        // Drag & Drop zóny pro myš
         document.querySelectorAll('.grave-area').forEach(area => {
             area.addEventListener('dragover', (e) => e.preventDefault());
             area.addEventListener('drop', (e) => {
@@ -364,11 +362,10 @@
             const graveTarget = graveArea.dataset.target;
 
             if (itemTarget === graveTarget || itemTarget === 'both') {
-                // Přesuneme do hrobu
                 graveArea.appendChild(item);
                 item.setAttribute('draggable', 'false');
                 
-                // Nastavíme anatomickou pozici pomocí procent definovaných u předmětu
+                // Přichycení na přesnou anatomickou pozici
                 item.style.left = item.dataset.posX;
                 item.style.top = item.dataset.posY;
                 
@@ -380,7 +377,7 @@
                     }, 500);
                 }
             } else {
-                // Špatný hrob -> bliknutí červeně a návrat dolů
+                // Špatné umístění - animace odmítnutí
                 item.style.borderColor = 'var(--error-color)';
                 setTimeout(() => {
                     item.style.borderColor = 'var(--accent-gold)';
