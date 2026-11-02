@@ -51,15 +51,22 @@
             color: #c5b49c;
         }
 
-        /* Herní plocha s přizpůsobeným rámečkem */
-        .game-board {
+        /* Hlavní layout: Hroby vlevo, zásobník vpravo */
+        .main-layout {
             display: flex;
-            gap: 30px;
-            justify-content: center;
-            align-items: center;
+            gap: 20px;
             flex: 1;
             min-height: 0;
-            margin-bottom: 15px;
+        }
+
+        /* Sekce hrobů (vlevo) */
+        .game-board {
+            display: flex;
+            gap: 20px;
+            justify-content: flex-start;
+            align-items: center;
+            flex: 2;
+            height: 100%;
         }
 
         .grave-container {
@@ -72,12 +79,11 @@
             padding: 10px;
             position: relative;
             aspect-ratio: 9 / 16;
-            max-width: 45vw;
         }
 
         .grave-container h2 {
             margin: 0 0 8px 0;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             color: var(--accent-gold);
             text-align: center;
             white-space: nowrap;
@@ -105,62 +111,68 @@
             background-image: url('hrob-zena.png');
         }
 
-        /* Spodní zásobník artefaktů */
+        /* Pravý panel se zásobníkem artefaktů (větší předměty) */
         .inventory-panel {
-            height: 130px;
+            flex: 1;
             background-color: var(--panel-bg);
             border: 2px solid #5c4a3d;
             border-radius: 12px;
-            padding: 10px 15px;
+            padding: 15px;
             display: flex;
             flex-direction: column;
+            max-width: 350px;
+            height: 100%;
         }
 
         .inventory-panel h3 {
-            margin: 0 0 6px 0;
-            font-size: 0.95rem;
-            color: #c5b49c;
+            margin: 0 0 10px 0;
+            font-size: 1.1rem;
+            color: var(--accent-gold);
             text-align: center;
         }
 
         .items-pool {
-            display: flex;
-            gap: 10px;
-            align-items: center;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2 sloupce pro větší pohodlí a velikost */
+            gap: 12px;
+            align-content: start;
             flex: 1;
-            overflow-x: auto;
+            overflow-y: auto;
             padding: 5px;
         }
 
-        /* Karta předmětu v zásobníku dole */
+        /* Karta předmětu v zásobníku - zvětšená */
         .item {
-            width: 75px;
-            height: 75px;
-            min-width: 75px;
+            height: 95px;
             background-color: #3d3127;
             border: 2px solid var(--accent-gold);
-            border-radius: 8px;
+            border-radius: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 4px;
+            padding: 8px;
             cursor: grab;
             touch-action: none;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .item:hover {
+            border-color: #fff;
+            transform: scale(1.03);
         }
 
         .item img {
             max-width: 100%;
-            max-height: 42px;
+            max-height: 55px; /* Větší náhledy obrázků */
             object-fit: contain;
             pointer-events: none;
         }
 
         .item .name {
-            font-size: 0.65rem;
+            font-size: 0.75rem;
             text-align: center;
-            margin-top: 3px;
+            margin-top: 5px;
             line-height: 1;
             white-space: nowrap;
             overflow: hidden;
@@ -168,7 +180,7 @@
             width: 100%;
         }
 
-        /* Předmět po umístění do hrobu - se zvýrazněním a zlatavou září */
+        /* Předmět v hrobě - nesvítí, dokud se na něj nenajede / neklekne */
         .grave-area .item {
             position: absolute;
             width: 60px;
@@ -181,23 +193,22 @@
             transform: translate(-50%, -50%) scale(var(--item-scale, 1));
             transition: left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
                         top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-                        transform 0.2s ease,
-                        filter 0.2s ease;
+                        transform 0.2s ease;
             padding: 0;
         }
 
-        /* Zlatavý obrys kolem samotného obrázku artefaktu */
         .grave-area .item img {
             max-height: 100%;
             max-width: 100%;
-            filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.85)) drop-shadow(0 4px 8px rgba(0,0,0,0.9));
-            transition: filter 0.2s ease;
+            /* Základní stav bez svícení, jen jemný stín pro odlišení od pozadí */
+            filter: drop-shadow(0 3px 5px rgba(0,0,0,0.8));
+            transition: filter 0.2s ease, transform 0.2s ease;
         }
 
-        /* Efekt při najetí / stisknutí */
+        /* Rozsvícení (zlatá záře) POUZE při najetí myší nebo stisknutí */
         .grave-area .item:hover img,
         .grave-area .item:active img {
-            filter: drop-shadow(0 0 12px rgba(255, 223, 100, 1)) drop-shadow(0 4px 12px rgba(0,0,0,1));
+            filter: drop-shadow(0 0 10px rgba(255, 223, 100, 1)) drop-shadow(0 4px 10px rgba(0,0,0,1));
         }
 
         .grave-area .item:active {
@@ -275,24 +286,24 @@
         <p>Přetáhni artefakty do správného hrobu</p>
     </header>
 
-    <div class="game-board">
-        <!-- Mužský hrob -->
-        <div class="grave-container">
-            <h2>Mužský hrob (Válečník)</h2>
-            <div class="grave-area" id="male-grave" data-target="male"></div>
+    <div class="main-layout">
+        <!-- Hroby vlevo -->
+        <div class="game-board">
+            <div class="grave-container">
+                <h2>Mužský hrob (Válečník)</h2>
+                <div class="grave-area" id="male-grave" data-target="male"></div>
+            </div>
+            <div class="grave-container">
+                <h2>Ženský hrob</h2>
+                <div class="grave-area" id="female-grave" data-target="female"></div>
+            </div>
         </div>
 
-        <!-- Ženský hrob -->
-        <div class="grave-container">
-            <h2>Ženský hrob</h2>
-            <div class="grave-area" id="female-grave" data-target="female"></div>
+        <!-- Zásobník prvků vpravo (větší předměty) -->
+        <div class="inventory-panel">
+            <h3>Nalezené artefakty:</h3>
+            <div class="items-pool" id="pool"></div>
         </div>
-    </div>
-
-    <!-- Zásobník prvků -->
-    <div class="inventory-panel">
-        <h3>Nalezené artefakty:</h3>
-        <div class="items-pool" id="pool"></div>
     </div>
 
     <!-- Informační okno o předmětu -->
@@ -316,8 +327,8 @@
 
     <script>
         const itemsData = [
-            // Mužské předměty - meč upraven na pravý bok a k pasu (posX: 67%, posY: 58%)
-            { id: 'mec', name: 'Železný meč', img: 'mec.png', target: 'male', posX: '38%', posY: '58%', scale: 1.9, info: 'Test 1 popis po vložení meče.' },
+            // Mužské předměty (meč upraven na pravý bok a k pasu)
+            { id: 'mec', name: 'Test 1', img: 'mec.png', target: 'male', posX: '38%', posY: '58%', scale: 1.9, info: 'Test 1 popis po vložení meče.' },
             { id: 'stit', name: 'Test 2', img: 'stit.png', target: 'male', posX: '30%', posY: '50%', scale: 1.5, info: 'Test 2 popis po vložení štítu.' },
             { id: 'opasek-muz', name: 'Test 3', img: 'opasek-muz.png', target: 'male', posX: '50%', posY: '52%', scale: 1.2, info: 'Test 3 popis po vložení opasku.' },
             { id: 'spona-muz', name: 'Test 4', img: 'spona-muz.png', target: 'male', posX: '50%', posY: '32%', scale: 0.7, info: 'Test 4 popis po vložení spony.' },
@@ -391,8 +402,8 @@
                 el.addEventListener('touchmove', (e) => {
                     if (!draggedItem || draggedItem.classList.contains('placed')) return;
                     const touch = e.touches[0];
-                    draggedItem.style.left = (touch.clientX - 35) + 'px';
-                    draggedItem.style.top = (touch.clientY - 35) + 'px';
+                    draggedItem.style.left = (touch.clientX - 45) + 'px';
+                    draggedItem.style.top = (touch.clientY - 45) + 'px';
                 }, {passive: true});
 
                 el.addEventListener('touchend', (e) => {
