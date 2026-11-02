@@ -51,10 +51,12 @@
             color: #c5b49c;
         }
 
-        /* Hlavní layout: Hroby vlevo, zásobník vpravo */
+        /* Hlavní layout: Zarovnaný na střed, kompaktní bez obřích mezer */
         .main-layout {
             display: flex;
-            gap: 20px;
+            gap: 30px;
+            justify-content: center;
+            align-items: center;
             flex: 1;
             min-height: 0;
         }
@@ -63,9 +65,8 @@
         .game-board {
             display: flex;
             gap: 20px;
-            justify-content: flex-start;
+            justify-content: center;
             align-items: center;
-            flex: 2;
             height: 100%;
         }
 
@@ -111,17 +112,16 @@
             background-image: url('hrob-zena.png');
         }
 
-        /* Pravý panel se zásobníkem artefaktů (větší předměty) */
+        /* Panel se zásobníkem artefaktů vpravo – pevná šířka, žádné roztahování */
         .inventory-panel {
-            flex: 1;
+            width: 340px;
+            height: 100%;
             background-color: var(--panel-bg);
             border: 2px solid #5c4a3d;
             border-radius: 12px;
             padding: 15px;
             display: flex;
             flex-direction: column;
-            max-width: 350px;
-            height: 100%;
         }
 
         .inventory-panel h3 {
@@ -133,7 +133,7 @@
 
         .items-pool {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 2 sloupce pro větší pohodlí a velikost */
+            grid-template-columns: repeat(2, 1fr);
             gap: 12px;
             align-content: start;
             flex: 1;
@@ -141,7 +141,7 @@
             padding: 5px;
         }
 
-        /* Karta předmětu v zásobníku - zvětšená */
+        /* Karta předmětu v zásobníku */
         .item {
             height: 95px;
             background-color: #3d3127;
@@ -164,7 +164,7 @@
 
         .item img {
             max-width: 100%;
-            max-height: 55px; /* Větší náhledy obrázků */
+            max-height: 55px;
             object-fit: contain;
             pointer-events: none;
         }
@@ -180,7 +180,7 @@
             width: 100%;
         }
 
-        /* Předmět v hrobě - nesvítí, dokud se na něj nenajede / neklekne */
+        /* Předmět v hrobě - nesvítí, dokud se na něj nenajede */
         .grave-area .item {
             position: absolute;
             width: 60px;
@@ -200,12 +200,10 @@
         .grave-area .item img {
             max-height: 100%;
             max-width: 100%;
-            /* Základní stav bez svícení, jen jemný stín pro odlišení od pozadí */
             filter: drop-shadow(0 3px 5px rgba(0,0,0,0.8));
             transition: filter 0.2s ease, transform 0.2s ease;
         }
 
-        /* Rozsvícení (zlatá záře) POUZE při najetí myší nebo stisknutí */
         .grave-area .item:hover img,
         .grave-area .item:active img {
             filter: drop-shadow(0 0 10px rgba(255, 223, 100, 1)) drop-shadow(0 4px 10px rgba(0,0,0,1));
@@ -299,7 +297,7 @@
             </div>
         </div>
 
-        <!-- Zásobník prvků vpravo (větší předměty) -->
+        <!-- Zásobník prvků vpravo -->
         <div class="inventory-panel">
             <h3>Nalezené artefakty:</h3>
             <div class="items-pool" id="pool"></div>
@@ -327,8 +325,8 @@
 
     <script>
         const itemsData = [
-            // Mužské předměty (meč upraven na pravý bok a k pasu)
-            { id: 'mec', name: 'Test 1', img: 'mec.png', target: 'male', posX: '38%', posY: '58%', scale: 1.9, info: 'Test 1 popis po vložení meče.' },
+            // Mužské předměty - meč přejmenován a měřítko zvětšeno na 2.1
+            { id: 'mec', name: 'Železný meč', img: 'mec.png', target: 'male', posX: '38%', posY: '58%', scale: 2.1, info: 'Dlouhé železné meče v kovaných pochvách byly hlavní výzbrojí keltských bojovníků.' },
             { id: 'stit', name: 'Test 2', img: 'stit.png', target: 'male', posX: '30%', posY: '50%', scale: 1.5, info: 'Test 2 popis po vložení štítu.' },
             { id: 'opasek-muz', name: 'Test 3', img: 'opasek-muz.png', target: 'male', posX: '50%', posY: '52%', scale: 1.2, info: 'Test 3 popis po vložení opasku.' },
             { id: 'spona-muz', name: 'Test 4', img: 'spona-muz.png', target: 'male', posX: '50%', posY: '32%', scale: 0.7, info: 'Test 4 popis po vložení spony.' },
