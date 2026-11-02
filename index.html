@@ -2,7 +2,8 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Povolení zoomování na mobilech -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0">
     <title>Sestav keltský hrob - Moravská archeologie</title>
     <style>
         :root {
@@ -29,7 +30,7 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* PC verze zůstává netknutá a stabilní */
+            overflow: hidden;
         }
 
         header {
@@ -217,18 +218,7 @@
             display: none;
         }
 
-        /* --- SPECIÁLNÍ ÚPRAVA POUZE PRO MOBILY / MALÉ OBRAZOVKY --- */
-        @media (max-width: 1150px) {
-            body {
-                overflow-x: auto; /* Povolí posun do strany na mobilu */
-                overflow-y: auto;
-            }
-            .main-layout {
-                min-width: 1100px; /* Zachová identické rozvržení a správné poměry jako na PC */
-            }
-        }
-
-        /* Modální okna (info / výhra) */
+        /* Modální okna (info / výhra) – nastavena extrémně vysoká vrstva z-index, aby byla vždy nahoře */
         .modal {
             position: fixed;
             top: 0;
@@ -239,7 +229,7 @@
             display: none;
             justify-content: center;
             align-items: center;
-            z-index: 100;
+            z-index: 999999;
         }
 
         .modal-content {
@@ -285,6 +275,17 @@
             border-radius: 20px;
             cursor: pointer;
             margin-top: 15px;
+        }
+
+        /* Speciální úprava pouze pro mobily/tablety, aby fungoval horizontální posun a zoom nad hroby */
+        @media (max-width: 1150px) {
+            body {
+                overflow-x: auto;
+                overflow-y: auto;
+            }
+            .main-layout {
+                min-width: 1100px;
+            }
         }
     </style>
 </head>
