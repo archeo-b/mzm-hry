@@ -2,7 +2,8 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Úprava pro mobilní zařízení: automatické přizpůsobení celého obsahu na šířku displeje -->
+    <meta name="viewport" content="width=1200, initial-scale=1.0">
     <title>Sestav keltský hrob - Moravská archeologie</title>
     <style>
         :root {
@@ -51,9 +52,7 @@
             color: #c5b49c;
         }
 
-        /* ========================================================= */
-        /* --- VERZE PRO PC A MUZEJNÍ KIOSKY (PŮVODNÍ LAYOUT) --- */
-        /* ========================================================= */
+        /* Hlavní layout (původní netknutý) */
         .main-layout {
             display: flex;
             gap: 30px;
@@ -215,55 +214,7 @@
             display: none;
         }
 
-        /* ========================================================= */
-        /* --- VERZE PRO MOBILNÍ TELEFONY A TABLETY (ODDĚLENÁ) --- */
-        /* ========================================================= */
-        @media (max-width: 900px) {
-            body {
-                overflow-y: auto;
-                height: auto;
-            }
-
-            .main-layout {
-                flex-direction: column-reverse;
-                align-items: center;
-                gap: 15px;
-            }
-
-            .game-board {
-                flex-direction: column;
-                width: 100%;
-                height: auto;
-            }
-
-            .grave-container {
-                width: 100%;
-                max-width: 360px;
-                height: 540px;
-                aspect-ratio: auto;
-            }
-
-            .inventory-panel {
-                width: 100%;
-                max-width: 360px;
-                height: auto;
-                max-height: 240px;
-            }
-
-            .items-pool {
-                grid-template-columns: repeat(4, 1fr);
-            }
-
-            .item {
-                height: 80px;
-            }
-
-            .item img {
-                max-height: 40px;
-            }
-        }
-
-        /* Modální okna (společné) */
+        /* Modální okna */
         .modal {
             position: fixed;
             top: 0;
@@ -373,8 +324,8 @@
     <script>
         const itemsData = [
             // Mužské předměty
-            { id: 'mec', name: 'Železný meč', img: 'mec.png', target: 'male', posX: '38%', posY: '58%', scale: 2.3, info: 'Popis popis.' },
-            { id: 'stit', name: 'Test 2', img: 'stit.png', target: 'male', posX: '30%', posY: '50%', scale: 1.5, info: 'Test 2 popis po vložení štítu.' },
+            { id: 'mec', name: 'Železný meč', img: 'mec.png', target: 'male', posX: '38%', posY: '58%', scale: 2.3, info: 'popis popis.' },
+            { id: 'stit', name: 'Štít', img: 'stit.png', target: 'male', posX: '68%', posY: '50%', scale: 3.0, info: 'Test 2 popis po vložení štítu.' },
             { id: 'opasek-muz', name: 'Test 3', img: 'opasek-muz.png', target: 'male', posX: '50%', posY: '52%', scale: 1.2, info: 'Test 3 popis po vložení opasku.' },
             { id: 'spona-muz', name: 'Test 4', img: 'spona-muz.png', target: 'male', posX: '50%', posY: '32%', scale: 0.7, info: 'Test 4 popis po vložení spony.' },
             
@@ -451,8 +402,8 @@
                 el.addEventListener('touchmove', (e) => {
                     if (!draggedItem || draggedItem.classList.contains('placed')) return;
                     const touch = e.touches[0];
-                    draggedItem.style.left = (touch.clientX - 40) + 'px';
-                    draggedItem.style.top = (touch.clientY - 40) + 'px';
+                    el.style.left = (touch.clientX - 40) + 'px';
+                    el.style.top = (touch.clientY - 40) + 'px';
                 }, {passive: true});
 
                 el.addEventListener('touchend', (e) => {
