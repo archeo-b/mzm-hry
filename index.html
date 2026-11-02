@@ -26,10 +26,13 @@
             background-color: var(--bg-color);
             color: var(--text-light);
             font-family: 'Segoe UI', Arial, sans-serif;
-            height: 100vh;
+            min-height: 100vh;
+            /* Pevná minimální šířka zaručí, že se layout na mobilu nerozbije, ale půjde posouvat */
+            min-width: 1100px; 
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            overflow-x: auto; /* Povolí posun na šířku na mobilu */
+            overflow-y: auto;
         }
 
         header {
@@ -51,14 +54,14 @@
             color: #c5b49c;
         }
 
-        /* Hlavní layout - plně přizpůsobitelný obrazovce */
+        /* Hlavní layout */
         .main-layout {
             display: flex;
             gap: 30px;
             justify-content: center;
             align-items: center;
             flex: 1;
-            min-height: 0;
+            min-height: 550px;
             width: 100%;
         }
 
@@ -387,7 +390,7 @@
                     e.dataTransfer.setData('text/plain', el.id);
                 });
 
-                // Dotyk (Mobil / Tablet)
+                // Dotyk (Mobil / Tablet) s podporou posunu stránky
                 el.addEventListener('touchstart', (e) => {
                     if (el.classList.contains('placed')) return;
                     draggedItem = el;
