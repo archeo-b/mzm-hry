@@ -78,15 +78,15 @@
             text-align: center;
         }
 
-        /* Oblast hrobu - opraveno plné vyplnění pozadí bez rámečků a černých pruhů */
+        /* Oblast hrobu - opraveno na contain, aby se zobrazil celý obrázek bez ořezu */
         .grave-area {
             flex: 1;
             background-color: #14100e;
-            background-size: cover; /* Vyplní celou plochu kontejneru bez černých pruhů */
+            background-size: contain; /* Zobrazí celý obrázek hrobu od hlavy až k patě */
             background-position: center;
             background-repeat: no-repeat;
             border-radius: 8px;
-            border: none; /* Odstraněn nehezký čárkovaný obdélník */
+            border: none;
             position: relative;
             overflow: hidden;
         }
@@ -162,16 +162,16 @@
             width: 100%;
         }
 
-        /* Předmět po umíštění do hrobu - bez pozadí a bez obdélníkového rámečku */
+        /* Předmět po umíštění do hrobu */
         .grave-area .item {
             position: absolute;
             width: 60px;
             height: 60px;
             min-width: unset;
-            background-color: transparent; /* Bez pozadí */
-            border: none; /* Bez obdélníkového rámečku */
-            box-shadow: none; /* Bez stínu obdélníku */
-            cursor: pointer; /* Zruší grab, po kliknutí znovu otevře okno */
+            background-color: transparent;
+            border: none;
+            box-shadow: none;
+            cursor: pointer;
             transform: translate(-50%, -50%) scale(var(--item-scale, 1));
             transition: left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
                         top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
@@ -182,11 +182,11 @@
         .grave-area .item img {
             max-height: 100%;
             max-width: 100%;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.7)); /* Jemný stín pod samotným předmětem pro lepší viditelnost */
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.7));
         }
 
         .grave-area .item .name {
-            display: none; /* Skryje textový název po umístění */
+            display: none;
         }
 
         /* Modální okna (info / výhra) */
@@ -347,21 +347,21 @@
                     <div class="name">${item.name}</div>
                 `;
 
-                // Kliknutí na již umístěný artefakt znovu otevře okno
+                // Kliknutí na již umístěný artefakt v hrobě
                 el.addEventListener('click', (e) => {
                     if (el.classList.contains('placed')) {
                         showInfoModal(el.dataset.name, el.dataset.info);
                     }
                 });
 
-                // Události pro myš
+                // Myš
                 el.addEventListener('dragstart', (e) => {
                     if (el.classList.contains('placed')) return;
                     draggedItem = el;
                     e.dataTransfer.setData('text/plain', el.id);
                 });
 
-                // Události pro dotykovou obrazovku
+                // Dotyk
                 el.addEventListener('touchstart', (e) => {
                     if (el.classList.contains('placed')) return;
                     draggedItem = el;
@@ -411,20 +411,17 @@
             if (itemTarget === graveTarget || itemTarget === 'both') {
                 graveArea.appendChild(item);
                 item.setAttribute('draggable', 'false');
-                item.classList.add('placed'); // Označení, že předmět už je v hrobě
+                item.classList.add('placed');
                 
-                // Přichycení na anatomickou pozici a měřítko
                 item.style.left = item.dataset.posX;
                 item.style.top = item.dataset.posY;
                 item.style.setProperty('--item-scale', item.dataset.scale);
                 
                 score++;
 
-                // Zobrazení informačního okna
                 showInfoModal(item.dataset.name, item.dataset.info);
 
             } else {
-                // Špatné umístění - červené bliknutí
                 item.style.borderColor = 'var(--error-color)';
                 setTimeout(() => {
                     item.style.borderColor = 'var(--accent-gold)';
