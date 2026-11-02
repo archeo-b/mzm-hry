@@ -51,7 +51,7 @@
             color: #c5b49c;
         }
 
-        /* Hlavní layout: Zarovnaný na střed, kompaktní bez obřích mezer */
+        /* Hlavní layout: Zarovnaný na střed, kompaktní */
         .main-layout {
             display: flex;
             gap: 30px;
@@ -112,7 +112,7 @@
             background-image: url('hrob-zena.png');
         }
 
-        /* Panel se zásobníkem artefaktů vpravo – pevná šířka, žádné roztahování */
+        /* Panel se zásobníkem artefaktů vpravo */
         .inventory-panel {
             width: 340px;
             height: 100%;
@@ -325,8 +325,8 @@
 
     <script>
         const itemsData = [
-            // Mužské předměty - meč přejmenován a měřítko zvětšeno na 2.1
-            { id: 'mec', name: 'Železný meč', img: 'mec.png', target: 'male', posX: '38%', posY: '58%', scale: 2.3, info: 'Železný meč v pochvě popis' },
+            // Mužské předměty (Železný meč zvětšen na 2.1)
+            { id: 'mec', name: 'Železný meč', img: 'mec.png', target: 'male', posX: '38%', posY: '58%', scale: 2.3, info: 'Popisek.' },
             { id: 'stit', name: 'Test 2', img: 'stit.png', target: 'male', posX: '30%', posY: '50%', scale: 1.5, info: 'Test 2 popis po vložení štítu.' },
             { id: 'opasek-muz', name: 'Test 3', img: 'opasek-muz.png', target: 'male', posX: '50%', posY: '52%', scale: 1.2, info: 'Test 3 popis po vložení opasku.' },
             { id: 'spona-muz', name: 'Test 4', img: 'spona-muz.png', target: 'male', posX: '50%', posY: '32%', scale: 0.7, info: 'Test 4 popis po vložení spony.' },
@@ -382,14 +382,14 @@
                     }
                 });
 
-                // Myš
+                // Myš (Desktop)
                 el.addEventListener('dragstart', (e) => {
                     if (el.classList.contains('placed')) return;
                     draggedItem = el;
                     e.dataTransfer.setData('text/plain', el.id);
                 });
 
-                // Dotyk
+                // Dotyk (Mobil / Tablet)
                 el.addEventListener('touchstart', (e) => {
                     if (el.classList.contains('placed')) return;
                     draggedItem = el;
@@ -409,11 +409,20 @@
                     draggedItem.style.position = 'static';
                     
                     const touch = e.changedTouches[0];
-                    const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-                    const graveArea = elementBelow ? elementBelow.closest('.grave-area') : null;
+                    const x = touch.clientX;
+                    const y = touch.clientY;
 
-                    if (graveArea) {
-                        evaluateDrop(draggedItem, graveArea);
+                    // Robustní detekce hrobu podle reálných rozměrů na obrazovce (funguje skvěle i na mobilech)
+                    let targetGrave = null;
+                    document.querySelectorAll('.grave-area').forEach(area => {
+                        const rect = area.getBoundingClientRect();
+                        if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                            targetGrave = area;
+                        }
+                    });
+
+                    if (targetGrave) {
+                        evaluateDrop(draggedItem, targetGrave);
                     }
                     draggedItem = null;
                 });
@@ -422,6 +431,7 @@
             });
         }
 
+        // Drop pro PC (myš)
         document.querySelectorAll('.grave-area').forEach(area => {
             area.addEventListener('dragover', (e) => e.preventDefault());
             area.addEventListener('drop', (e) => {
@@ -441,6 +451,7 @@
                 item.setAttribute('draggable', 'false');
                 item.classList.add('placed');
                 
+                // Přichycení na pevnou anatomickou pozici
                 item.style.left = item.dataset.posX;
                 item.style.top = item.dataset.posY;
                 item.style.setProperty('--item-scale', item.dataset.scale);
@@ -450,6 +461,7 @@
                 showInfoModal(item.dataset.name, item.dataset.info);
 
             } else {
+                // Špatné umístění - bliknutí červeně a vrácení zpět
                 item.style.borderColor = 'var(--error-color)';
                 setTimeout(() => {
                     item.style.borderColor = 'var(--accent-gold)';
