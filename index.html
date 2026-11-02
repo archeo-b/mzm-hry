@@ -186,7 +186,7 @@
             padding: 0;
         }
 
-        /* Zlatavý obrys (drop-shadow záře) kolem samotného obrázku artefaktu */
+        /* Zlatavý obrys kolem samotného obrázku artefaktu */
         .grave-area .item img {
             max-height: 100%;
             max-width: 100%;
@@ -194,7 +194,7 @@
             transition: filter 0.2s ease;
         }
 
-        /* Efekt při najetí / stisknutí (hover / active / click) */
+        /* Efekt při najetí / stisknutí */
         .grave-area .item:hover img,
         .grave-area .item:active img {
             filter: drop-shadow(0 0 12px rgba(255, 223, 100, 1)) drop-shadow(0 4px 12px rgba(0,0,0,1));
@@ -309,15 +309,15 @@
     <div class="modal" id="win-modal">
         <div class="modal-content">
             <h2>Hrobová výbava je kompletní!</h2>
-            <p>Skvělá práce! Úspěšně jsi uložil všechny artefakty.</p>
+            <p>Skvělá práce! Úspěšně jsi uložil všechny artefakty na tělo zemřelého.</p>
             <button class="action-btn" onclick="resetGame()">Nová hra</button>
         </div>
     </div>
 
     <script>
         const itemsData = [
-            // Mužské předměty
-            { id: 'mec', name: 'Test 1', img: 'mec.png', target: 'male', posX: '64%', posY: '53%', scale: 1.9, info: 'Test 1 popis po vložení meče.' },
+            // Mužské předměty - meč upraven na pravý bok a k pasu (posX: 67%, posY: 58%)
+            { id: 'mec', name: 'Test 1', img: 'mec.png', target: 'male', posX: '67%', posY: '58%', scale: 1.9, info: 'Test 1 popis po vložení meče.' },
             { id: 'stit', name: 'Test 2', img: 'stit.png', target: 'male', posX: '30%', posY: '50%', scale: 1.5, info: 'Test 2 popis po vložení štítu.' },
             { id: 'opasek-muz', name: 'Test 3', img: 'opasek-muz.png', target: 'male', posX: '50%', posY: '52%', scale: 1.2, info: 'Test 3 popis po vložení opasku.' },
             { id: 'spona-muz', name: 'Test 4', img: 'spona-muz.png', target: 'male', posX: '50%', posY: '32%', scale: 0.7, info: 'Test 4 popis po vložení spony.' },
