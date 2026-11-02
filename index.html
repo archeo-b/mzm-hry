@@ -171,7 +171,6 @@
             background-color: rgba(30, 24, 20, 0.9);
             border-color: var(--correct-color);
             cursor: default;
-            /* Transformace pro vycentrování a aplikaci vlastního měřítka (scale) */
             transform: translate(-50%, -50%) scale(var(--item-scale, 1));
             transition: left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
                         top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
@@ -253,7 +252,7 @@
 
     <header>
         <h1>Sestav keltský hrob</h1>
-        <p>Přetáhni artefakty do hrobu – po správném umístění se dozvíš zajímavosti.</p>
+        <p>Přetáhni artefakty do hrobu – po správném umístění se zobrazí info.</p>
     </header>
 
     <div class="game-board">
@@ -290,46 +289,33 @@
     <div class="modal" id="win-modal">
         <div class="modal-content">
             <h2>Hrobová výbava je kompletní!</h2>
-            <p>Skvělá práce! Úspěšně jsi uložil všechny artefakty na tělo zemřelého podle moravských archeologických nálezů.</p>
+            <p>Skvělá práce! Úspěšně jsi uložil všechny artefakty na tělo zemřelého.</p>
             <button class="action-btn" onclick="resetGame()">Nová hra</button>
         </div>
     </div>
 
     <script>
         /*
-          V poli itemsData je u každého artefaktu nová hodnota "scale":
-          - 1.0 = běžná velikost
-          - 1.6 = zvětšení (např. meč, štít)
-          - 0.7 = zmenšení (např. spony, přeslen)
+          V poli itemsData jsou názvy a popisky dočasně nastavené jako Test 1, Test 2 atd.
+          Můžete si je zde snadno přepsat na vlastní texty.
         */
         const itemsData = [
             // Mužské předměty
-            { id: 'mec', name: 'Meč', img: 'mec.png', target: 'male', posX: '65%', posY: '55%', scale: 1.8,
-              info: 'Dlouhé železné meče v kovaných pochvách byly hlavní výzbrojí keltských bojovníků. Často byly do hrobu rituálně ohnuty, aby „zemřely“ spolu se svým majitelem.' },
-            { id: 'stit', name: 'Štít', img: 'stit.png', target: 'male', posX: '30%', posY: '50%', scale: 1.5,
-              info: 'Dřevěné štíty s kovovou středovou záštitou (umbonem) poskytovaly keltským bojovníkům ochranu v bojích. Na Moravě se nacházejí právě tyto bronzové nebo železné umbony.' },
-            { id: 'opasek-muz', name: 'Opasek', img: 'opasek-muz.png', target: 'male', posX: '50%', posY: '52%', scale: 1.2,
-              info: 'Bohatě zdobené kovové opasky z kroužků či destiček držely oděv bojovníka a sloužily také jako podpora pro zavěšení meče.' },
-            { id: 'spona-muz', name: 'Spona', img: 'spona-muz.png', target: 'male', posX: '50%', posY: '32%', scale: 0.7,
-              info: 'Fibule (spony) fungovaly jako  antický „zavírací špendlík“ na sepnutí pláště či tuniky. U mužů se často nacházejí na hrudi nebo rameni.' },
+            { id: 'mec', name: 'Test 1', img: 'mec.png', target: 'male', posX: '65%', posY: '55%', scale: 1.8, info: 'Test 1 popis po vložení meče.' },
+            { id: 'stit', name: 'Test 2', img: 'stit.png', target: 'male', posX: '30%', posY: '50%', scale: 1.5, info: 'Test 2 popis po vložení štítu.' },
+            { id: 'opasek-muz', name: 'Test 3', img: 'opasek-muz.png', target: 'male', posX: '50%', posY: '52%', scale: 1.2, info: 'Test 3 popis po vložení opasku.' },
+            { id: 'spona-muz', name: 'Test 4', img: 'spona-muz.png', target: 'male', posX: '50%', posY: '32%', scale: 0.7, info: 'Test 4 popis po vložení spony.' },
             
             // Ženské předměty
-            { id: 'nakrcnik', name: 'Nákrčník', img: 'nakrcnik.png', target: 'female', posX: '50%', posY: '22%', scale: 1.1,
-              info: 'Torques (nákrčník) byl symbolem vysokého společenského postavení, moci a bohatství. Nosili ho muži i ženy z keltské elity.' },
-            { id: 'spona-zena', name: 'Spony', img: 'spona-zena.png', target: 'female', posX: '50%', posY: '32%', scale: 0.7,
-              info: 'Ženy nosívaly páry ozdobných spon na obou ramenech k sepnutí svrchního šatu (peplosu).' },
-            { id: 'opasek-zena', name: 'Opasek', img: 'opasek-zena.png', target: 'female', posX: '50%', posY: '55%', scale: 1.2,
-              info: 'Ženské opasky byly často ozdobeny řetízkem, bronzovými přívěsky nebo kovanými kováními.' },
-            { id: 'bronz-naramek', name: 'Náramky', img: 'bronz-naramek.png', target: 'female', posX: '32%', posY: '45%', scale: 0.8,
-              info: 'Duté nebo masivní bronzové náramky (např. typu švarcvaldského) patřily k běžné a velmi oblíbené ženské parádě.' },
-            { id: 'nanoznik', name: 'Nánožník', img: 'nanoznik.png', target: 'female', posX: '50%', posY: '85%', scale: 0.9,
-              info: 'Nánožníky (kroužky na kotníky) se na Moravě objevují v mladší době laténské jako specifický módní doplněk.' },
-            { id: 'preslen', name: 'Přeslen', img: 'preslen.png', target: 'female', posX: '75%', posY: '65%', scale: 0.6,
-              info: 'Malé hliněné nebo kamenné setrvačníky sloužily k ručnímu předení nití na vřetenu – důkaz každodenní domácí práce keltských žen.' },
+            { id: 'nakrcnik', name: 'Test 5', img: 'nakrcnik.png', target: 'female', posX: '50%', posY: '22%', scale: 1.1, info: 'Test 5 popis po vložení nákrčníku.' },
+            { id: 'spona-zena', name: 'Test 6', img: 'spona-zena.png', target: 'female', posX: '50%', posY: '32%', scale: 0.7, info: 'Test 6 popis po vložení spon.' },
+            { id: 'opasek-zena', name: 'Test 7', img: 'opasek-zena.png', target: 'female', posX: '50%', posY: '55%', scale: 1.2, info: 'Test 7 popis po vložení opasku.' },
+            { id: 'bronz-naramek', name: 'Test 8', img: 'bronz-naramek.png', target: 'female', posX: '32%', posY: '45%', scale: 0.8, info: 'Test 8 popis po vložení náramku.' },
+            { id: 'nanoznik', name: 'Test 9', img: 'nanoznik.png', target: 'female', posX: '50%', posY: '85%', scale: 0.9, info: 'Test 9 popis po vložení nánožníku.' },
+            { id: 'preslen', name: 'Test 10', img: 'preslen.png', target: 'female', posX: '75%', posY: '65%', scale: 0.6, info: 'Test 10 popis po vložení přeslenu.' },
 
             // Univerzální předmět
-            { id: 'keramika', name: 'Keramika', img: 'keramika.png', target: 'both', posX: '75%', posY: '80%', scale: 1.3,
-              info: 'Hliněné nádoby (hrnce, misky, koflíky) v hrobech obsahovaly potraviny a nápoje jako zásobu na cestu zemřelého na onen svět.' }
+            { id: 'keramika', name: 'Test 11', img: 'keramika.png', target: 'both', posX: '75%', posY: '80%', scale: 1.3, info: 'Test 11 popis po vložení keramiky.' }
         ];
 
         let draggedItem = null;
@@ -420,14 +406,14 @@
                 graveArea.appendChild(item);
                 item.setAttribute('draggable', 'false');
                 
-                // Přichycení na anatomickou pozici a nastavení nastaveného měřítka (scale)
+                // Přichycení na anatomickou pozici a nastavení měřítka
                 item.style.left = item.dataset.posX;
                 item.style.top = item.dataset.posY;
                 item.style.setProperty('--item-scale', item.dataset.scale);
                 
                 score++;
 
-                // Zobrazení informačního okna o předmětu
+                // Zobrazení informačního okna
                 showInfoModal(item.dataset.name, item.dataset.info);
 
             } else {
@@ -450,7 +436,7 @@
         function closeInfoModal() {
             document.getElementById('info-modal').style.display = 'none';
 
-            // Po zavření info okna zkontrolovat dokončení
+            // Po zavření okna zkontrolovat dokončení hry
             if (score === totalItems) {
                 setTimeout(() => {
                     document.getElementById('win-modal').style.display = 'flex';
