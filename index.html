@@ -51,17 +51,20 @@
             color: #c5b49c;
         }
 
-        /* Herní plocha */
+        /* Herní plocha - vycentrovaná pro těsně přilehlé rámečky */
         .game-board {
             display: flex;
-            gap: 20px;
+            gap: 30px;
+            justify-content: center;
+            align-items: center;
             flex: 1;
             min-height: 0;
             margin-bottom: 15px;
         }
 
+        /* Zlatý obvodový rámeček se přizpůsobuje přímo velkosti obrázku hrobu */
         .grave-container {
-            flex: 1;
+            height: 100%;
             background-color: var(--panel-bg);
             border: 2px solid var(--accent-gold);
             border-radius: 12px;
@@ -69,20 +72,26 @@
             flex-direction: column;
             padding: 10px;
             position: relative;
+            /* Automatický poměr stran podle typického hrobu (cca 9:16) */
+            aspect-ratio: 9 / 16;
+            max-width: 45vw;
         }
 
         .grave-container h2 {
             margin: 0 0 8px 0;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: var(--accent-gold);
             text-align: center;
+            white-space: nowrap;
         }
 
-        /* Oblast hrobu - opraveno na contain, aby se zobrazil celý obrázek bez ořezu */
+        /* Oblast hrobu - vyplňuje 100 % vnitřku rámečku */
         .grave-area {
             flex: 1;
+            width: 100%;
+            height: 100%;
             background-color: #14100e;
-            background-size: contain; /* Zobrazí celý obrázek hrobu od hlavy až k patě */
+            background-size: cover; /* Obrázek vyplní celý zlatý rámeček */
             background-position: center;
             background-repeat: no-repeat;
             border-radius: 8px;
