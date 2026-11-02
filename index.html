@@ -2,7 +2,7 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sestav keltský hrob - Moravská archeologie</title>
     <style>
         :root {
@@ -26,15 +26,16 @@
             background-color: var(--bg-color);
             color: var(--text-light);
             font-family: 'Segoe UI', Arial, sans-serif;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto; /* Povolí skrolování na mobilu */
         }
 
         header {
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         header h1 {
@@ -51,27 +52,31 @@
             color: #c5b49c;
         }
 
-        /* Hlavní layout: Zarovnaný na střed, kompaktní */
+        /* Hlavní layout pro PC / Kiosk (na šířku) */
         .main-layout {
             display: flex;
-            gap: 30px;
+            gap: 20px;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             flex: 1;
-            min-height: 0;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        /* Sekce hrobů (vlevo) */
         .game-board {
             display: flex;
             gap: 20px;
             justify-content: center;
             align-items: center;
-            height: 100%;
+            flex: 2;
         }
 
         .grave-container {
-            height: 100%;
+            width: 100%;
+            max-width: 400px;
+            height: 70vh;
+            min-height: 480px;
             background-color: var(--panel-bg);
             border: 2px solid var(--accent-gold);
             border-radius: 12px;
@@ -79,7 +84,6 @@
             flex-direction: column;
             padding: 10px;
             position: relative;
-            aspect-ratio: 9 / 16;
         }
 
         .grave-container h2 {
@@ -112,10 +116,11 @@
             background-image: url('hrob-zena.png');
         }
 
-        /* Panel se zásobníkem artefaktů vpravo */
+        /* Zásobník prvků */
         .inventory-panel {
-            width: 340px;
-            height: 100%;
+            width: 320px;
+            height: 70vh;
+            min-height: 480px;
             background-color: var(--panel-bg);
             border: 2px solid #5c4a3d;
             border-radius: 12px;
@@ -134,7 +139,7 @@
         .items-pool {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 10px;
             align-content: start;
             flex: 1;
             overflow-y: auto;
@@ -143,7 +148,7 @@
 
         /* Karta předmětu v zásobníku */
         .item {
-            height: 95px;
+            height: 90px;
             background-color: #3d3127;
             border: 2px solid var(--accent-gold);
             border-radius: 10px;
@@ -151,20 +156,15 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 8px;
+            padding: 6px;
             cursor: grab;
             touch-action: none;
             transition: border-color 0.2s, transform 0.2s;
         }
 
-        .item:hover {
-            border-color: #fff;
-            transform: scale(1.03);
-        }
-
         .item img {
             max-width: 100%;
-            max-height: 55px;
+            max-height: 50px;
             object-fit: contain;
             pointer-events: none;
         }
@@ -180,7 +180,7 @@
             width: 100%;
         }
 
-        /* Předmět v hrobě - nesvítí, dokud se na něj nenajede */
+        /* Předmět v hrobě */
         .grave-area .item {
             position: absolute;
             width: 60px;
@@ -201,7 +201,7 @@
             max-height: 100%;
             max-width: 100%;
             filter: drop-shadow(0 3px 5px rgba(0,0,0,0.8));
-            transition: filter 0.2s ease, transform 0.2s ease;
+            transition: filter 0.2s ease;
         }
 
         .grave-area .item:hover img,
@@ -209,15 +209,45 @@
             filter: drop-shadow(0 0 10px rgba(255, 223, 100, 1)) drop-shadow(0 4px 10px rgba(0,0,0,1));
         }
 
-        .grave-area .item:active {
-            transform: translate(-50%, -50%) scale(calc(var(--item-scale, 1) * 1.15));
-        }
-
         .grave-area .item .name {
             display: none;
         }
 
-        /* Modální okna (info / výhra) */
+        /* Responsive úprava pro telefony (displeje na výšku nebo s malou šířkou) */
+        @media (max-width: 900px) {
+            body {
+                overflow-y: auto;
+            }
+
+            .main-layout {
+                flex-direction: column-reverse; /* Zásobník dáme nahoru nebo dolů dle potřeby */
+                align-items: center;
+            }
+
+            .game-board {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .grave-container {
+                width: 100%;
+                max-width: 360px;
+                height: 520px;
+            }
+
+            .inventory-panel {
+                width: 100%;
+                max-width: 360px;
+                height: auto;
+                max-height: 250px;
+            }
+
+            .items-pool {
+                grid-template-columns: repeat(4, 1fr); /* 4 v řadě na mobilu */
+            }
+        }
+
+        /* Modální okna */
         .modal {
             position: fixed;
             top: 0;
@@ -228,7 +258,7 @@
             display: none;
             justify-content: center;
             align-items: center;
-            z-index: 100;
+            z-index: 2000;
         }
 
         .modal-content {
@@ -238,6 +268,7 @@
             border-radius: 16px;
             text-align: center;
             max-width: 500px;
+            width: 90%;
             position: relative;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7);
         }
@@ -285,7 +316,7 @@
     </header>
 
     <div class="main-layout">
-        <!-- Hroby vlevo -->
+        <!-- Hroby -->
         <div class="game-board">
             <div class="grave-container">
                 <h2>Mužský hrob (Válečník)</h2>
@@ -297,14 +328,14 @@
             </div>
         </div>
 
-        <!-- Zásobník prvků vpravo -->
+        <!-- Zásobník prvků -->
         <div class="inventory-panel">
             <h3>Nalezené artefakty:</h3>
             <div class="items-pool" id="pool"></div>
         </div>
     </div>
 
-    <!-- Informační okno o předmětu -->
+    <!-- Informační okno -->
     <div class="modal" id="info-modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeInfoModal()">&times;</button>
@@ -325,13 +356,11 @@
 
     <script>
         const itemsData = [
-            // Mužské předměty (Železný meč zvětšen na 2.1)
-            { id: 'mec', name: 'Železný meč', img: 'mec.png', target: 'male', posX: '38%', posY: '58%', scale: 2.3, info: 'Popisek.' },
+            { id: 'mec', name: 'Železný meč', img: 'mec.png', target: 'male', posX: '38%', posY: '58%', scale: 2.1, info: 'Dlouhé železné meče v kovaných pochvách byly hlavní výzbrojí keltských bojovníků.' },
             { id: 'stit', name: 'Test 2', img: 'stit.png', target: 'male', posX: '30%', posY: '50%', scale: 1.5, info: 'Test 2 popis po vložení štítu.' },
             { id: 'opasek-muz', name: 'Test 3', img: 'opasek-muz.png', target: 'male', posX: '50%', posY: '52%', scale: 1.2, info: 'Test 3 popis po vložení opasku.' },
             { id: 'spona-muz', name: 'Test 4', img: 'spona-muz.png', target: 'male', posX: '50%', posY: '32%', scale: 0.7, info: 'Test 4 popis po vložení spony.' },
             
-            // Ženské předměty
             { id: 'nakrcnik', name: 'Test 5', img: 'nakrcnik.png', target: 'female', posX: '50%', posY: '22%', scale: 1.1, info: 'Test 5 popis po vložení nákrčníku.' },
             { id: 'spona-zena', name: 'Test 6', img: 'spona-zena.png', target: 'female', posX: '50%', posY: '32%', scale: 0.7, info: 'Test 6 popis po vložení spon.' },
             { id: 'opasek-zena', name: 'Test 7', img: 'opasek-zena.png', target: 'female', posX: '50%', posY: '55%', scale: 1.2, info: 'Test 7 popis po vložení opasku.' },
@@ -339,7 +368,6 @@
             { id: 'nanoznik', name: 'Test 9', img: 'nanoznik.png', target: 'female', posX: '50%', posY: '85%', scale: 0.9, info: 'Test 9 popis po vložení nánožníku.' },
             { id: 'preslen', name: 'Test 10', img: 'preslen.png', target: 'female', posX: '75%', posY: '65%', scale: 0.6, info: 'Test 10 popis po vložení přeslenu.' },
 
-            // Univerzální předmět
             { id: 'keramika', name: 'Test 11', img: 'keramika.png', target: 'both', posX: '75%', posY: '80%', scale: 1.3, info: 'Test 11 popis po vložení keramiky.' }
         ];
 
@@ -375,48 +403,53 @@
                     <div class="name">${item.name}</div>
                 `;
 
-                // Kliknutí na již umístěný artefakt v hrobě
+                // Kliknutí na již umístěný artefakt
                 el.addEventListener('click', (e) => {
                     if (el.classList.contains('placed')) {
                         showInfoModal(el.dataset.name, el.dataset.info);
                     }
                 });
 
-                // Myš (Desktop)
+                // Myš
                 el.addEventListener('dragstart', (e) => {
                     if (el.classList.contains('placed')) return;
                     draggedItem = el;
                     e.dataTransfer.setData('text/plain', el.id);
                 });
 
-                // Dotyk (Mobil / Tablet)
+                // Dotykové ovládání přesně přizpůsobené pro mobil i se skrolováním
                 el.addEventListener('touchstart', (e) => {
                     if (el.classList.contains('placed')) return;
                     draggedItem = el;
                     el.style.position = 'fixed';
                     el.style.zIndex = '1000';
+                    
+                    const touch = e.touches[0];
+                    el.style.left = (touch.clientX - 40) + 'px';
+                    el.style.top = (touch.clientY - 40) + 'px';
                 }, {passive: true});
 
                 el.addEventListener('touchmove', (e) => {
                     if (!draggedItem || draggedItem.classList.contains('placed')) return;
                     const touch = e.touches[0];
-                    draggedItem.style.left = (touch.clientX - 45) + 'px';
-                    draggedItem.style.top = (touch.clientY - 45) + 'px';
+                    draggedItem.style.left = (touch.clientX - 40) + 'px';
+                    draggedItem.style.top = (touch.clientY - 40) + 'px';
                 }, {passive: true});
 
                 el.addEventListener('touchend', (e) => {
                     if (!draggedItem || draggedItem.classList.contains('placed')) return;
-                    draggedItem.style.position = 'static';
                     
                     const touch = e.changedTouches[0];
-                    const x = touch.clientX;
-                    const y = touch.clientY;
+                    // Přesný výpočet bodu puštění na obrazovce (klíčové pro mobil)
+                    const touchX = touch.clientX;
+                    const touchY = touch.clientY;
 
-                    // Robustní detekce hrobu podle reálných rozměrů na obrazovce (funguje skvěle i na mobilech)
+                    draggedItem.style.position = 'static';
+
                     let targetGrave = null;
                     document.querySelectorAll('.grave-area').forEach(area => {
                         const rect = area.getBoundingClientRect();
-                        if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                        if (touchX >= rect.left && touchX <= rect.right && touchY >= rect.top && touchY <= rect.bottom) {
                             targetGrave = area;
                         }
                     });
@@ -431,7 +464,7 @@
             });
         }
 
-        // Drop pro PC (myš)
+        // Drop pro PC
         document.querySelectorAll('.grave-area').forEach(area => {
             area.addEventListener('dragover', (e) => e.preventDefault());
             area.addEventListener('drop', (e) => {
@@ -451,7 +484,7 @@
                 item.setAttribute('draggable', 'false');
                 item.classList.add('placed');
                 
-                // Přichycení na pevnou anatomickou pozici
+                // Přichycení na pevné anatomické místo v hrobě
                 item.style.left = item.dataset.posX;
                 item.style.top = item.dataset.posY;
                 item.style.setProperty('--item-scale', item.dataset.scale);
@@ -461,7 +494,6 @@
                 showInfoModal(item.dataset.name, item.dataset.info);
 
             } else {
-                // Špatné umístění - bliknutí červeně a vrácení zpět
                 item.style.borderColor = 'var(--error-color)';
                 setTimeout(() => {
                     item.style.borderColor = 'var(--accent-gold)';
