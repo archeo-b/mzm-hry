@@ -26,13 +26,10 @@
             background-color: var(--bg-color);
             color: var(--text-light);
             font-family: 'Segoe UI', Arial, sans-serif;
-            min-height: 100vh;
-            /* Pevná minimální šířka zaručí, že se layout na mobilu nerozbije, ale půjde posouvat */
-            min-width: 1100px; 
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow-x: auto; /* Povolí posun na šířku na mobilu */
-            overflow-y: auto;
+            overflow: hidden;
         }
 
         header {
@@ -54,17 +51,17 @@
             color: #c5b49c;
         }
 
-        /* Hlavní layout */
+        /* Hlavní layout: Zarovnaný na střed, kompaktní */
         .main-layout {
             display: flex;
             gap: 30px;
             justify-content: center;
             align-items: center;
             flex: 1;
-            min-height: 550px;
-            width: 100%;
+            min-height: 0;
         }
 
+        /* Sekce hrobů (vlevo) */
         .game-board {
             display: flex;
             gap: 20px;
@@ -115,6 +112,7 @@
             background-image: url('hrob-zena.png');
         }
 
+        /* Panel se zásobníkem artefaktů vpravo */
         .inventory-panel {
             width: 340px;
             height: 100%;
@@ -143,6 +141,7 @@
             padding: 5px;
         }
 
+        /* Karta předmětu v zásobníku */
         .item {
             height: 95px;
             background-color: #3d3127;
@@ -181,6 +180,7 @@
             width: 100%;
         }
 
+        /* Předmět v hrobě - nesvítí, dokud se na něj nenajede */
         .grave-area .item {
             position: absolute;
             width: 60px;
@@ -217,7 +217,7 @@
             display: none;
         }
 
-        /* Modální okna */
+        /* Modální okna (info / výhra) */
         .modal {
             position: fixed;
             top: 0;
@@ -228,7 +228,7 @@
             display: none;
             justify-content: center;
             align-items: center;
-            z-index: 2000;
+            z-index: 100;
         }
 
         .modal-content {
@@ -238,7 +238,6 @@
             border-radius: 16px;
             text-align: center;
             max-width: 500px;
-            width: 90%;
             position: relative;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7);
         }
@@ -326,9 +325,9 @@
 
     <script>
         const itemsData = [
-            // Mužské předměty
-            { id: 'mec', name: 'Železný meč', img: 'mec.png', target: 'male', posX: '38%', posY: '58%', scale: 2.1, info: 'Dlouhé železné meče v kovaných pochvách byly hlavní výzbrojí keltských bojovníků.' },
-            { id: 'stit', name: 'Test 2', img: 'stit.png', target: 'male', posX: '30%', posY: '50%', scale: 1.5, info: 'Test 2 popis po vložení štítu.' },
+            // Mužské předměty (meč zvětšen na 2.3, štít na 3.0 a posX 68%)
+            { id: 'mec', name: 'Železný meč', img: 'mec.png', target: 'male', posX: '38%', posY: '58%', scale: 2.3, info: 'Dlouhé železné meče v kovaných pochvách byly hlavní výzbrojí keltských bojovníků.' },
+            { id: 'stit', name: 'Test 2', img: 'stit.png', target: 'male', posX: '68%', posY: '50%', scale: 3.0, info: 'Test 2 popis po vložení štítu.' },
             { id: 'opasek-muz', name: 'Test 3', img: 'opasek-muz.png', target: 'male', posX: '50%', posY: '52%', scale: 1.2, info: 'Test 3 popis po vložení opasku.' },
             { id: 'spona-muz', name: 'Test 4', img: 'spona-muz.png', target: 'male', posX: '50%', posY: '32%', scale: 0.7, info: 'Test 4 popis po vložení spony.' },
             
@@ -376,7 +375,7 @@
                     <div class="name">${item.name}</div>
                 `;
 
-                // Kliknutí na již umístěný artefakt
+                // Kliknutí na již umístěný artefakt v hrobě
                 el.addEventListener('click', (e) => {
                     if (el.classList.contains('placed')) {
                         showInfoModal(el.dataset.name, el.dataset.info);
@@ -390,7 +389,7 @@
                     e.dataTransfer.setData('text/plain', el.id);
                 });
 
-                // Dotyk (Mobil / Tablet) s podporou posunu stránky
+                // Dotyk (Mobil / Tablet)
                 el.addEventListener('touchstart', (e) => {
                     if (el.classList.contains('placed')) return;
                     draggedItem = el;
@@ -416,7 +415,10 @@
                     const touchX = touch.clientX;
                     const touchY = touch.clientY;
 
-                    draggedItem.style.position = 'static';
+                    // Odstranění inline pozice, aby zabralo CSS absolute
+                    draggedItem.style.position = '';
+                    draggedItem.style.left = '';
+                    draggedItem.style.top = '';
 
                     let targetGrave = null;
                     document.querySelectorAll('.grave-area').forEach(area => {
@@ -428,6 +430,8 @@
 
                     if (targetGrave) {
                         evaluateDrop(draggedItem, targetGrave);
+                    } else {
+                        document.getElementById('pool').appendChild(draggedItem);
                     }
                     draggedItem = null;
                 });
@@ -436,7 +440,7 @@
             });
         }
 
-        // Drop pro PC
+        // Drop pro PC (myš)
         document.querySelectorAll('.grave-area').forEach(area => {
             area.addEventListener('dragover', (e) => e.preventDefault());
             area.addEventListener('drop', (e) => {
@@ -451,11 +455,15 @@
             const itemTarget = item.dataset.target;
             const graveTarget = graveArea.dataset.target;
 
+            // Zajištění čistých inline stylů pro absolutní pozicování
+            item.style.position = '';
+
             if (itemTarget === graveTarget || itemTarget === 'both') {
                 graveArea.appendChild(item);
                 item.setAttribute('draggable', 'false');
                 item.classList.add('placed');
                 
+                // Přichycení na správnou anatomickou pozici
                 item.style.left = item.dataset.posX;
                 item.style.top = item.dataset.posY;
                 item.style.setProperty('--item-scale', item.dataset.scale);
@@ -468,7 +476,6 @@
                 item.style.borderColor = 'var(--error-color)';
                 setTimeout(() => {
                     item.style.borderColor = 'var(--accent-gold)';
-                    item.style.position = 'static';
                     document.getElementById('pool').appendChild(item);
                 }, 300);
             }
