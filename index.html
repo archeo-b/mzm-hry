@@ -204,7 +204,7 @@
             width: 100%;
         }
 
-        /* Předmět v hrobě - původní plné měřítko + zlatá svatozář pro viditelnost malých předmětů */
+        /* Předmět v hrobě - bez záře, přesná interakce */
         .grave-area .item {
             position: absolute;
             width: 60px;
@@ -219,22 +219,21 @@
                         top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
                         transform 0.2s ease;
             padding: 0;
-            /* Zamezení nechtěnému klikání mimo vizuální prvek */
             pointer-events: none; 
         }
 
         .grave-area .item img {
             max-height: 100%;
             max-width: 100%;
-            pointer-events: auto; /* Reaguje na kliknutí vyloženě přesně na obrázek */
-            /* Výrazná zlatá svatozář pro skvělou viditelnost i malých předmětů */
-            filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.8)) drop-shadow(0 3px 6px rgba(0,0,0,0.9));
+            pointer-events: auto;
+            /* Čistý jemný stín pro plastičnost, bez svatozáře */
+            filter: drop-shadow(0 3px 5px rgba(0,0,0,0.8));
             transition: filter 0.2s ease, transform 0.2s ease;
         }
 
         .grave-area .item:hover img,
         .grave-area .item:active img {
-            filter: drop-shadow(0 0 12px rgba(255, 223, 100, 1)) drop-shadow(0 4px 10px rgba(0,0,0,1));
+            filter: drop-shadow(0 0 8px rgba(255, 223, 100, 0.8)) drop-shadow(0 4px 8px rgba(0,0,0,1));
         }
 
         .grave-area .item:active {
@@ -245,7 +244,7 @@
             display: none;
         }
 
-        /* Modální okna (info / výhra) – extrémně vysoká vrstva z-index, aby byla vždy nahoře */
+        /* Modální okna (info / výhra) */
         .modal {
             position: fixed;
             top: 0;
@@ -365,12 +364,12 @@
 
     <script>
         const itemsData = [
-            // Mužské předměty
+            // Mužské předměty (opasek je dřív než štít, takže bude pod ním)
             { id: 'mec', name: 'Železný meč', img: 'mec.png', target: 'male', posX: '38%', posY: '60%', scale: 2.6, info: 'Popis popis.' },
-            { id: 'stit', name: 'Štít', img: 'stit.png', target: 'male', posX: '63%', posY: '50%', scale: 3.5, info: 'Test 2 popis po vložení štítu.' },
-            { id: 'kopi', name: 'Kopí', img: 'kopi.png', target: 'male', posX: '25%', posY: '52%', scale: 6.5, info: 'Test 3 popis po vložení kopi.' },
-            { id: 'spona-muz', name: 'Železná spona', img: 'spona-muz.png', target: 'male', posX: '44%', posY: '34%', scale: 0.5, info: 'Test 4 popis po vložení spony.' },
             { id: 'opasek-muz', name: 'Železný opasek', img: 'opasek-muz.png', target: 'male', posX: '50%', posY: '45%', scale: 1.2, info: 'Test 4 popis po vložení opasku.' },
+            { id: 'stit', name: 'Štít', img: 'stit.png', target: 'male', posX: '63%', posY: '50%', scale: 3.5, info: 'Test 2 popis po vložení štítu.' },
+            { id: 'kopi', name: 'Kopí', img: 'kopi.png', target: 'male', posX: '25%', posY: '52%', scale: 4.5, info: 'Test 3 popis po vložení kopi.' },
+            { id: 'spona-muz', name: 'Železná spona', img: 'spona-muz.png', target: 'male', posX: '44%', posY: '34%', scale: 0.5, info: 'Test 4 popis po vložení spony.' },
             
             // Ženské předměty
             { id: 'nakrcnik', name: 'Test 5', img: 'nakrcnik.png', target: 'female', posX: '50%', posY: '22%', scale: 1.1, info: 'Test 5 popis po vložení nákrčníku.' },
