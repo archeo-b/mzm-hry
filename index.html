@@ -204,35 +204,41 @@
             width: 100%;
         }
 
-        /* Předmět v hrobě - přesná velikost bez obřího neviditelného rámečku + zvýraznění (zlatá svatozář) */
+        /* Předmět v hrobě - původní plné měřítko + zlatá svatozář pro viditelnost malých předmětů */
         .grave-area .item {
             position: absolute;
-            width: calc(55px * var(--item-scale, 1));
-            height: calc(55px * var(--item-scale, 1));
+            width: 60px;
+            height: 60px;
             min-width: unset;
             background-color: transparent;
             border: none;
             box-shadow: none;
             cursor: pointer;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%) scale(var(--item-scale, 1));
             transition: left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
-                        top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                        top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                        transform 0.2s ease;
             padding: 0;
+            /* Zamezení nechtěnému klikání mimo vizuální prvek */
+            pointer-events: none; 
         }
 
         .grave-area .item img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            /* Zvýraznění: stín + jemná zlatavá záře, aby byly vidět i malé předměty */
-            filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.7)) drop-shadow(0 3px 6px rgba(0,0,0,0.9));
+            max-height: 100%;
+            max-width: 100%;
+            pointer-events: auto; /* Reaguje na kliknutí vyloženě přesně na obrázek */
+            /* Výrazná zlatá svatozář pro skvělou viditelnost i malých předmětů */
+            filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.8)) drop-shadow(0 3px 6px rgba(0,0,0,0.9));
             transition: filter 0.2s ease, transform 0.2s ease;
         }
 
         .grave-area .item:hover img,
         .grave-area .item:active img {
-            filter: drop-shadow(0 0 10px rgba(255, 223, 100, 1)) drop-shadow(0 4px 10px rgba(0,0,0,1));
-            transform: scale(1.08);
+            filter: drop-shadow(0 0 12px rgba(255, 223, 100, 1)) drop-shadow(0 4px 10px rgba(0,0,0,1));
+        }
+
+        .grave-area .item:active {
+            transform: translate(-50%, -50%) scale(calc(var(--item-scale, 1) * 1.15));
         }
 
         .grave-area .item .name {
@@ -362,17 +368,17 @@
             // Mužské předměty
             { id: 'mec', name: 'Železný meč', img: 'mec.png', target: 'male', posX: '38%', posY: '60%', scale: 2.6, info: 'Popis popis.' },
             { id: 'stit', name: 'Štít', img: 'stit.png', target: 'male', posX: '63%', posY: '50%', scale: 3.5, info: 'Test 2 popis po vložení štítu.' },
-            { id: 'kopi', name: 'Kopí', img: 'kopi.png', target: 'male', posX: '25%', posY: '52%', scale: 4.5, info: 'Test 3 popis po vložení kopi.' },
-            { id: 'spona-muz', name: 'Železná spona', img: 'spona-muz.png', target: 'male', posX: '44%', posY: '34%', scale: 0.9, info: 'Test 4 popis po vložení spony.' },
-            { id: 'opasek-muz', name: 'Železný opasek', img: 'opasek-muz.png', target: 'male', posX: '50%', posY: '48%', scale: 1.5, info: 'Test 4 popis po vložení opasku.' },
+            { id: 'kopi', name: 'Kopí', img: 'kopi.png', target: 'male', posX: '25%', posY: '52%', scale: 6.5, info: 'Test 3 popis po vložení kopi.' },
+            { id: 'spona-muz', name: 'Železná spona', img: 'spona-muz.png', target: 'male', posX: '44%', posY: '34%', scale: 0.5, info: 'Test 4 popis po vložení spony.' },
+            { id: 'opasek-muz', name: 'Železný opasek', img: 'opasek-muz.png', target: 'male', posX: '50%', posY: '45%', scale: 1.2, info: 'Test 4 popis po vložení opasku.' },
             
             // Ženské předměty
             { id: 'nakrcnik', name: 'Test 5', img: 'nakrcnik.png', target: 'female', posX: '50%', posY: '22%', scale: 1.1, info: 'Test 5 popis po vložení nákrčníku.' },
-            { id: 'spona-zena', name: 'Test 6', img: 'spona-zena.png', target: 'female', posX: '50%', posY: '32%', scale: 0.9, info: 'Test 6 popis po vložení spon.' },
+            { id: 'spona-zena', name: 'Test 6', img: 'spona-zena.png', target: 'female', posX: '50%', posY: '32%', scale: 0.7, info: 'Test 6 popis po vložení spon.' },
             { id: 'opasek-zena', name: 'Test 7', img: 'opasek-zena.png', target: 'female', posX: '50%', posY: '55%', scale: 1.2, info: 'Test 7 popis po vložení opasku.' },
-            { id: 'bronz-naramek', name: 'Test 8', img: 'bronz-naramek.png', target: 'female', posX: '32%', posY: '45%', scale: 1.0, info: 'Test 8 popis po vložení náramku.' },
-            { id: 'nanoznik', name: 'Test 9', img: 'nanoznik.png', target: 'female', posX: '50%', posY: '85%', scale: 1.0, info: 'Test 9 popis po vložení nánožníku.' },
-            { id: 'preslen', name: 'Test 10', img: 'preslen.png', target: 'female', posX: '75%', posY: '65%', scale: 0.9, info: 'Test 10 popis po vložení přeslenu.' },
+            { id: 'bronz-naramek', name: 'Test 8', img: 'bronz-naramek.png', target: 'female', posX: '32%', posY: '45%', scale: 0.8, info: 'Test 8 popis po vložení náramku.' },
+            { id: 'nanoznik', name: 'Test 9', img: 'nanoznik.png', target: 'female', posX: '50%', posY: '85%', scale: 0.9, info: 'Test 9 popis po vložení nánožníku.' },
+            { id: 'preslen', name: 'Test 10', img: 'preslen.png', target: 'female', posX: '75%', posY: '65%', scale: 0.6, info: 'Test 10 popis po vložení přeslenu.' },
 
             // Univerzální předmět
             { id: 'keramika', name: 'Test 11', img: 'keramika.png', target: 'both', posX: '75%', posY: '80%', scale: 1.3, info: 'Test 11 popis po vložení keramiky.' }
