@@ -36,6 +36,7 @@
         header {
             text-align: center;
             margin-bottom: 10px;
+            position: relative;
         }
 
         header h1 {
@@ -50,6 +51,28 @@
             margin: 5px 0 0 0;
             font-size: 1rem;
             color: #c5b49c;
+        }
+
+        /* Tlačítko pro restart v hlavičce */
+        .restart-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: transparent;
+            border: 2px solid var(--accent-gold);
+            color: var(--accent-gold);
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .restart-btn:hover {
+            background-color: var(--accent-gold);
+            color: #000;
         }
 
         /* Hlavní layout: Zarovnaný na střed, kompaktní */
@@ -218,7 +241,7 @@
             display: none;
         }
 
-        /* Modální okna (info / výhra) – nastavena extrémně vysoká vrstva z-index, aby byla vždy nahoře */
+        /* Modální okna (info / výhra) – extrémně vysoká vrstva z-index, aby byla vždy nahoře */
         .modal {
             position: fixed;
             top: 0;
@@ -294,6 +317,7 @@
     <header>
         <h1>Sestav keltský hrob</h1>
         <p>Přetáhni artefakty do správného hrobu</p>
+        <button class="restart-btn" onclick="resetGame()">Začít znovu</button>
     </header>
 
     <div class="main-layout">
@@ -338,8 +362,8 @@
     <script>
         const itemsData = [
             // Mužské předměty (meč zvětšen na 2.3, štít na 3.0 a posX 68%)
-            { id: 'mec', name: 'Železný meč', img: 'mec.png', target: 'male', posX: '38%', posY: '58%', scale: 2.3, info: 'Dlouhé železné meče v kovaných pochvách byly hlavní výzbrojí keltských bojovníků.' },
-            { id: 'stit', name: 'Test 2', img: 'stit.png', target: 'male', posX: '68%', posY: '50%', scale: 3.0, info: 'Test 2 popis po vložení štítu.' },
+            { id: 'mec', name: 'Železný meč', img: 'mec.png', target: 'male', posX: '38%', posY: '58%', scale: 2.5, info: 'Popis popis.' },
+            { id: 'stit', name: 'Test 2', img: 'stit.png', target: 'male', posX: '63%', posY: '50%', scale: 3.5, info: 'Test 2 popis po vložení štítu.' },
             { id: 'opasek-muz', name: 'Test 3', img: 'opasek-muz.png', target: 'male', posX: '50%', posY: '52%', scale: 1.2, info: 'Test 3 popis po vložení opasku.' },
             { id: 'spona-muz', name: 'Test 4', img: 'spona-muz.png', target: 'male', posX: '50%', posY: '32%', scale: 0.7, info: 'Test 4 popis po vložení spony.' },
             
