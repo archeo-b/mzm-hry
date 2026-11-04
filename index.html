@@ -204,7 +204,7 @@
             width: 100%;
         }
 
-        /* Předmět v hrobě */
+        /* Předmět v hrobě - bez záře, přesná interakce */
         .grave-area .item {
             position: absolute;
             width: 60px;
@@ -260,23 +260,40 @@
         .modal-content {
             background-color: var(--panel-bg);
             border: 3px solid var(--accent-gold);
-            padding: 30px 40px;
+            padding: 25px 30px;
             border-radius: 16px;
             text-align: center;
             max-width: 500px;
+            width: 90%;
             position: relative;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .modal-content h2 {
             color: var(--accent-gold);
             margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        /* Fotka v detailním okně */
+        .modal-img {
+            max-width: 100%;
+            max-height: 180px;
+            object-fit: contain;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            display: none; /* Skryje se, pokud fotka chybí */
         }
 
         .modal-content p {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             line-height: 1.5;
             color: var(--text-light);
+            margin: 0;
         }
 
         .close-btn {
@@ -347,6 +364,7 @@
         <div class="modal-content">
             <button class="close-btn" onclick="closeInfoModal()">&times;</button>
             <h2 id="info-title">Název předmětu</h2>
+            <img id="info-img" class="modal-img" src="" alt="Fotka předmětu">
             <p id="info-text">Zde bude text o předmětu...</p>
             <button class="action-btn" onclick="closeInfoModal()">Rozumím</button>
         </div>
@@ -363,17 +381,17 @@
 
     <script>
         const itemsData = [
-            // Mužské předměty
-            { id: 'mec', name: 'Železný meč', img: 'mec.png', target: 'male', posX: '38%', posY: '60%', scale: 2.8, info: 'Popis popis.', layer: 1 },
-            { id: 'opasek-muz', name: 'Železný opasek', img: 'opasek-muz.png', target: 'male', posX: '50%', posY: '48%', scale: 1.6, info: 'Test 4 popis po vložení opasku.', layer: 2 },
-            { id: 'stit', name: 'Štít', img: 'stit.png', target: 'male', posX: '63%', posY: '50%', scale: 3.5, info: 'Test 2 popis po vložení štítu.', layer: 3 },
-            { id: 'kopi', name: 'Kopí', img: 'kopi.png', target: 'male', posX: '25%', posY: '52%', scale: 6.5, info: 'Test 3 popis po vložení kopi.', layer: 4 },
-            { id: 'spona-muz', name: 'Železná spona', img: 'spona-muz.png', target: 'male', posX: '44%', posY: '34%', scale: 0.6, info: 'Test 4 popis po vložení spony.', layer: 5 },
+            // Mužské předměty (lze přidat i parametr detailImg pro speciální fotku)
+            { id: 'mec', name: 'Železný meč', img: 'mec.png', target: 'male', posX: '38%', posY: '60%', scale: 2.6, info: 'Popis popis.', layer: 1, detailImg: 'mec.png' },
+            { id: 'opasek-muz', name: 'Železný opasek', img: 'opasek-muz.png', target: 'male', posX: '50%', posY: '45%', scale: 1.2, info: 'Test 4 popis po vložení opasku.', layer: 2 },
+            { id: 'stit', name: 'Štít', img: 'stit.png', target: 'male', posX: '63%', posY: '50%', scale: 3.5, info: 'Test 2 popis po vložení štítu.', layer: 3, detailImg: 'stit.png' },
+            { id: 'kopi', name: 'Kopí', img: 'kopi.png', target: 'male', posX: '25%', posY: '52%', scale: 4.5, info: 'Test 3 popis po vložení kopi.', layer: 4 },
+            { id: 'spona-muz', name: 'Železná spona', img: 'spona-muz.png', target: 'male', posX: '44%', posY: '34%', scale: 0.5, info: 'Test 4 popis po vložení spony.', layer: 5 },
             
             // Ženské předměty
             { id: 'nakrcnik', name: 'Test 5', img: 'nakrcnik.png', target: 'female', posX: '50%', posY: '22%', scale: 1.1, info: 'Test 5 popis po vložení nákrčníku.', layer: 1 },
             { id: 'spona-zena', name: 'Test 6', img: 'spona-zena.png', target: 'female', posX: '50%', posY: '32%', scale: 0.7, info: 'Test 6 popis po vložení spon.', layer: 2 },
-            { id: 'opasek-zena', name: 'Bronzový opasek', img: 'opasek-zena.png', target: 'female', posX: '50%', posY: '50%', scale: 1.2, info: 'Test 7 popis po vložení opasku.', layer: 3 },
+            { id: 'opasek-zena', name: 'Test 7', img: 'opasek-zena.png', target: 'female', posX: '50%', posY: '55%', scale: 1.2, info: 'Test 7 popis po vložení opasku.', layer: 3 },
             { id: 'bronz-naramek', name: 'Test 8', img: 'bronz-naramek.png', target: 'female', posX: '32%', posY: '45%', scale: 0.8, info: 'Test 8 popis po vložení náramku.', layer: 4 },
             { id: 'nanoznik', name: 'Test 9', img: 'nanoznik.png', target: 'female', posX: '50%', posY: '85%', scale: 0.9, info: 'Test 9 popis po vložení nánožníku.', layer: 5 },
             { id: 'preslen', name: 'Test 10', img: 'preslen.png', target: 'female', posX: '75%', posY: '65%', scale: 0.6, info: 'Test 10 popis po vložení přeslenu.', layer: 6 },
@@ -409,6 +427,7 @@
                 el.dataset.name = item.name;
                 el.dataset.info = item.info;
                 el.dataset.layer = item.layer || 1;
+                el.dataset.detailImg = item.detailImg || item.img;
 
                 el.innerHTML = `
                     <img src="${item.img}" alt="${item.name}" onerror="this.style.display='none'">
@@ -418,7 +437,7 @@
                 // Kliknutí na již umístěný artefakt v hrobě
                 el.addEventListener('click', (e) => {
                     if (el.classList.contains('placed')) {
-                        showInfoModal(el.dataset.name, el.dataset.info);
+                        showInfoModal(el.dataset.name, el.dataset.info, el.dataset.detailImg);
                     }
                 });
 
@@ -505,7 +524,7 @@
                 item.style.top = item.dataset.posY;
                 item.style.setProperty('--item-scale', item.dataset.scale);
 
-                // Zajištění správného pořadí vrstev (layer) – prvek se vloží pod prvek s vyšším layerem
+                // Zajištění správného pořadí vrstev (layer)
                 const itemLayer = parseInt(item.dataset.layer);
                 let inserted = false;
                 
@@ -523,7 +542,7 @@
                 }
                 
                 score++;
-                showInfoModal(item.dataset.name, item.dataset.info);
+                showInfoModal(item.dataset.name, item.dataset.info, item.dataset.detailImg);
 
             } else {
                 item.style.borderColor = 'var(--error-color)';
@@ -534,9 +553,18 @@
             }
         }
 
-        function showInfoModal(title, text) {
+        function showInfoModal(title, text, imgSrc) {
             document.getElementById('info-title').innerText = title;
             document.getElementById('info-text').innerText = text;
+
+            const imgEl = document.getElementById('info-img');
+            if (imgSrc) {
+                imgEl.src = imgSrc;
+                imgEl.style.display = 'block';
+            } else {
+                imgEl.style.display = 'none';
+            }
+
             document.getElementById('info-modal').style.display = 'flex';
         }
 
