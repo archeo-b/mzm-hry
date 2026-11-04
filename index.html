@@ -382,7 +382,6 @@
     <script>
         const itemsData = [
             // Mužské předměty
-            // poolImg: obrázek v zásobníku (pokud chybí, použije se automaticky 'img')
             { id: 'mec', name: 'Železný meč', img: 'mec.png', poolImg: 'mec.png', target: 'male', posX: '38%', posY: '60%', scale: 2.8, info: 'Popis popis.', layer: 1, detailImg: 'mec.png' },
             { id: 'opasek-muz', name: 'Železný opasek', img: 'opasek-muz.png', poolImg: 'opasek-muz.png', target: 'male', posX: '50%', posY: '48%', scale: 1.6, info: 'Test 4 popis po vložení opasku.', layer: 2 },
             { id: 'stit', name: 'Štít', img: 'stit.png', poolImg: 'stit.png', target: 'male', posX: '63%', posY: '50%', scale: 3.5, info: 'Test 2 popis po vložení štítu.', layer: 3, detailImg: 'stit.png' },
@@ -429,12 +428,14 @@
                 el.dataset.info = item.info;
                 el.dataset.layer = item.layer || 1;
                 el.dataset.detailImg = item.detailImg || item.img;
+                
+                // Uložíme si obě cesty do datasetu prvku
+                el.dataset.graveImg = item.img;
+                el.dataset.poolImg = item.poolImg || item.img;
 
-                // Zde se pro ikonu v zásobníku použije poolImg, případně se fallbackuje na img
-                const iconSrc = item.poolImg || item.img;
-
+                // V zásobníku se použije ikona (poolImg)
                 el.innerHTML = `
-                    <img src="${iconSrc}" alt="${item.name}" onerror="this.style.display='none'">
+                    <img src="${el.dataset.poolImg}" alt="${item.name}" onerror="this.style.display='none'">
                     <div class="name">${item.name}</div>
                 `;
 
@@ -523,6 +524,12 @@
                 item.setAttribute('draggable', 'false');
                 item.classList.add('placed');
                 
+                // Přepnutí obrázku na hlavní verzi pro hrob (img)
+                const imgTag = item.querySelector('img');
+                if (imgTag) {
+                    imgTag.src = item.dataset.graveImg;
+                }
+
                 // Přichycení na správnou pozici
                 item.style.left = item.dataset.posX;
                 item.style.top = item.dataset.posY;
