@@ -286,7 +286,7 @@
             border-radius: 8px;
             margin-bottom: 15px;
             border: 1px solid rgba(212, 175, 55, 0.4);
-            display: none; /* Skryje se, pokud fotka chybí */
+            display: none;
         }
 
         .modal-content p {
@@ -381,23 +381,24 @@
 
     <script>
         const itemsData = [
-            // Mužské předměty (lze přidat i parametr detailImg pro speciální fotku)
-            { id: 'mec', name: 'Železný meč', img: 'mec.png', target: 'male', posX: '38%', posY: '60%', scale: 2.8, info: 'Popis popis.', layer: 1, detailImg: 'mec.png' },
-            { id: 'opasek-muz', name: 'Železný opasek', img: 'opasek-muz.png', target: 'male', posX: '50%', posY: '48%', scale: 1.6, info: 'Test 4 popis po vložení opasku.', layer: 2 },
-            { id: 'stit', name: 'Štít', img: 'stit.png', target: 'male', posX: '63%', posY: '50%', scale: 3.5, info: 'Test 2 popis po vložení štítu.', layer: 3, detailImg: 'stit.png' },
-            { id: 'kopi', name: 'Kopí', img: 'kopi.png', target: 'male', posX: '25%', posY: '52%', scale: 6.5, info: 'Test 3 popis po vložení kopi.', layer: 4 },
-            { id: 'spona-muz', name: 'Železná spona', img: 'spona-muz.png', target: 'male', posX: '44%', posY: '34%', scale: 0.6, info: 'Test 4 popis po vložení spony.', layer: 5 },
+            // Mužské předměty
+            // poolImg: obrázek v zásobníku (pokud chybí, použije se automaticky 'img')
+            { id: 'mec', name: 'Železný meč', img: 'mec.png', poolImg: 'mec.png', target: 'male', posX: '38%', posY: '60%', scale: 2.8, info: 'Popis popis.', layer: 1, detailImg: 'mec.png' },
+            { id: 'opasek-muz', name: 'Železný opasek', img: 'opasek-muz.png', poolImg: 'opasek-muz.png', target: 'male', posX: '50%', posY: '48%', scale: 1.6, info: 'Test 4 popis po vložení opasku.', layer: 2 },
+            { id: 'stit', name: 'Štít', img: 'stit.png', poolImg: 'stit.png', target: 'male', posX: '63%', posY: '50%', scale: 3.5, info: 'Test 2 popis po vložení štítu.', layer: 3, detailImg: 'stit.png' },
+            { id: 'kopi', name: 'Kopí', img: 'kopi.png', poolImg: 'kopi.png', target: 'male', posX: '25%', posY: '52%', scale: 6.5, info: 'Test 3 popis po vložení kopi.', layer: 4 },
+            { id: 'spona-muz', name: 'Železná spona', img: 'spona-muz.png', poolImg: 'spona-muz.png', target: 'male', posX: '44%', posY: '34%', scale: 0.6, info: 'Test 4 popis po vložení spony.', layer: 5 },
             
             // Ženské předměty
-            { id: 'nakrcnik', name: 'Test 5', img: 'nakrcnik.png', target: 'female', posX: '50%', posY: '22%', scale: 1.1, info: 'Test 5 popis po vložení nákrčníku.', layer: 1 },
-            { id: 'spona-zena', name: 'Test 6', img: 'spona-zena.png', target: 'female', posX: '50%', posY: '32%', scale: 0.7, info: 'Test 6 popis po vložení spon.', layer: 2 },
-            { id: 'opasek-zena', name: 'Bronzový opasek', img: 'opasek-zena.png', target: 'female', posX: '50%', posY: '50%', scale: 1.2, info: 'Test 7 popis po vložení opasku.', layer: 3 },
-            { id: 'bronz-naramek', name: 'Test 8', img: 'bronz-naramek.png', target: 'female', posX: '32%', posY: '45%', scale: 0.8, info: 'Test 8 popis po vložení náramku.', layer: 4 },
-            { id: 'nanoznik', name: 'Test 9', img: 'nanoznik.png', target: 'female', posX: '50%', posY: '85%', scale: 0.9, info: 'Test 9 popis po vložení nánožníku.', layer: 5 },
-            { id: 'preslen', name: 'Test 10', img: 'preslen.png', target: 'female', posX: '75%', posY: '65%', scale: 0.6, info: 'Test 10 popis po vložení přeslenu.', layer: 6 },
+            { id: 'nakrcnik', name: 'Test 5', img: 'nakrcnik.png', poolImg: 'nakrcnik.png', target: 'female', posX: '50%', posY: '22%', scale: 1.1, info: 'Test 5 popis po vložení nákrčníku.', layer: 1 },
+            { id: 'spona-zena', name: 'Test 6', img: 'spona-zena.png', poolImg: 'spona-zena.png', target: 'female', posX: '50%', posY: '32%', scale: 0.7, info: 'Test 6 popis po vložení spon.', layer: 2 },
+            { id: 'opasek-zena', name: 'Bronzový opasek', img: 'opasek-zena.png', poolImg: 'opasek-zena.png', target: 'female', posX: '50%', posY: '50%', scale: 1.2, info: 'Test 7 popis po vložení opasku.', layer: 3 },
+            { id: 'bronz-naramek', name: 'Test 8', img: 'bronz-naramek.png', poolImg: 'bronz-naramek.png', target: 'female', posX: '32%', posY: '45%', scale: 0.8, info: 'Test 8 popis po vložení náramku.', layer: 4 },
+            { id: 'nanoznik', name: 'Bronzový nánožník', img: 'nanoznik.png', poolImg: 'nanoznik.png', target: 'female', posX: '50%', posY: '68%', scale: 1.2, info: 'Test 9 popis po vložení nánožníku.', layer: 5 },
+            { id: 'preslen', name: 'Test 10', img: 'preslen.png', poolImg: 'preslen.png', target: 'female', posX: '75%', posY: '65%', scale: 0.6, info: 'Test 10 popis po vložení přeslenu.', layer: 6 },
 
             // Univerzální předmět
-            { id: 'keramika', name: 'Test 11', img: 'keramika.png', target: 'both', posX: '75%', posY: '80%', scale: 1.3, info: 'Test 11 popis po vložení keramiky.', layer: 10 }
+            { id: 'keramika', name: 'Test 11', img: 'keramika.png', poolImg: 'keramika.png', target: 'both', posX: '75%', posY: '80%', scale: 1.3, info: 'Test 11 popis po vložení keramiky.', layer: 10 }
         ];
 
         let draggedItem = null;
@@ -429,8 +430,11 @@
                 el.dataset.layer = item.layer || 1;
                 el.dataset.detailImg = item.detailImg || item.img;
 
+                // Zde se pro ikonu v zásobníku použije poolImg, případně se fallbackuje na img
+                const iconSrc = item.poolImg || item.img;
+
                 el.innerHTML = `
-                    <img src="${item.img}" alt="${item.name}" onerror="this.style.display='none'">
+                    <img src="${iconSrc}" alt="${item.name}" onerror="this.style.display='none'">
                     <div class="name">${item.name}</div>
                 `;
 
