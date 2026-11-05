@@ -421,8 +421,9 @@
             { id: 'nanoznik', name: 'Bronzový nánožník', img: 'nanoznik.png', poolImg: 'nanoznik-ikona.png', target: 'female', posX: '50%', posY: '70%', scale: 0.9, info: 'Test 9 popis po vložení nánožníku.', layer: 5 },
             { id: 'preslen', name: 'Test 10', img: 'preslen.png', poolImg: 'preslen.png', target: 'female', posX: '75%', posY: '65%', scale: 0.6, info: 'Test 10 popis po vložení přeslenu.', layer: 6 },
 
-            // Univerzální předmět
-            { id: 'keramika', name: 'Keramická nádoba', img: 'keramika.png', poolImg: 'keramika.png', target: 'both', posX: '75%', posY: '20%', scale: 0.8, info: 'Test 11 popis po vložení keramiky.', layer: 10 }
+            // Univerzální předmět (keramika pro oba hroby - pozici lze upravit v posX/posY a pro ženský hrob lze případně definovat i specifické umístění, zde použito univerzální)
+            { id: 'keramika', name: 'Keramická nádoba', img: 'keramika.png', poolImg: 'keramika.png', target: 'both', posX: '68%', posY: '20%', scale: 0.8, info: 'Test 11 popis po vložení keramiky.', layer: 10,
+              femalePosX: '68%', femalePosY: '20%', femaleScale: 0.8 } // Můžeš si upravit zvlášť pozici pro ženský hrob, pokud je potřeba
         ];
 
         let draggedItem = null;
@@ -449,36 +450,39 @@
                 el.dataset.posX = item.posX;
                 el.dataset.posY = item.posY;
                 el.dataset.scale = item.scale || 1.0;
+                
+                // Specifické pozice pro ženský hrob u 'both' prvků (pokud jsou zadány)
+                if (item.target === 'both') {
+                    el.dataset.femalePosX = item.femalePosX || item.posX;
+                    el.dataset.femalePosY = item.femalePosY || item.posY;
+                    el.dataset.femaleScale = item.femaleScale || item.scale || 1.0;
+                }
+
                 el.dataset.name = item.name;
                 el.dataset.info = item.info;
                 el.dataset.layer = item.layer || 1;
                 el.dataset.detailImg = item.detailImg || item.img;
                 
-                // Uložíme si obě cesty do datasetu prvku
                 el.dataset.graveImg = item.img;
                 el.dataset.poolImg = item.poolImg || item.img;
 
-                // V zásobníku se použije ikona (poolImg)
                 el.innerHTML = `
                     <img src="${el.dataset.poolImg}" alt="${item.name}" onerror="this.style.display='none'">
                     <div class="name">${item.name}</div>
                 `;
 
-                // Kliknutí na již umístěný artefakt v hrobě
                 el.addEventListener('click', (e) => {
                     if (el.classList.contains('placed')) {
                         showInfoModal(el.dataset.name, el.dataset.info, el.dataset.detailImg);
                     }
                 });
 
-                // Myš (Desktop)
                 el.addEventListener('dragstart', (e) => {
                     if (el.classList.contains('placed')) return;
                     draggedItem = el;
                     e.dataTransfer.setData('text/plain', el.id);
                 });
 
-                // Dotyk (Mobil / Tablet / Kiosek)
                 el.addEventListener('touchstart', (e) => {
                     if (el.classList.contains('placed')) return;
                     draggedItem = el;
@@ -528,7 +532,6 @@
             });
         }
 
-        // Drop pro PC (myš)
         document.querySelectorAll('.grave-area').forEach(area => {
             area.addEventListener('dragover', (e) => e.preventDefault());
             area.addEventListener('drop', (e) => {
@@ -546,37 +549,28 @@
             item.style.position = '';
 
             if (itemTarget === graveTarget || itemTarget === 'both') {
-                item.setAttribute('draggable', 'false');
-                item.classList.add('placed');
                 
-                // Přepnutí obrázku na hlavní verzi pro hrob (img)
-                const imgTag = item.querySelector('img');
-                if (imgTag) {
-                    imgTag.src = item.dataset.graveImg;
+                // Pokud je prvek univerzální ('both'), umístíme ho do aktuálního hrobu a vytvoříme kopii pro druhý hrob
+                if (itemTarget === 'both' && !item.dataset.cloned) {
+                    item.dataset.cloned = "true"; // Zablokuje zbytné klonování
+                    
+                    // Určíme, kam se umisťuje originál
+                    placeItemIntoGrave(item, graveArea, false);
+
+                    // Najdeme druhý hrob
+                    const otherGraveId = graveTarget === 'male' ? 'female-grave' : 'male-grave';
+                    const otherGraveArea = document.getElementById(otherGraveId);
+
+                    // Vytvoříme klon pro druhý hrob
+                    const clone = item.cloneNode(true);
+                    clone.dataset.cloned = "true";
+                    placeItemIntoGrave(clone, otherGraveArea, true);
+
+                } else {
+                    // Běžný prvek, který patří jen do jednoho hrobu
+                    placeItemIntoGrave(item, graveArea, false);
                 }
 
-                // Přichycení na správnou pozici
-                item.style.left = item.dataset.posX;
-                item.style.top = item.dataset.posY;
-                item.style.setProperty('--item-scale', item.dataset.scale);
-
-                // Zajištění správného pořadí vrstev (layer)
-                const itemLayer = parseInt(item.dataset.layer);
-                let inserted = false;
-                
-                for (let existingChild of graveArea.children) {
-                    const existingLayer = parseInt(existingChild.dataset.layer || 1);
-                    if (itemLayer < existingLayer) {
-                        graveArea.insertBefore(item, existingChild);
-                        inserted = true;
-                        break;
-                    }
-                }
-                
-                if (!inserted) {
-                    graveArea.appendChild(item);
-                }
-                
                 score++;
                 showInfoModal(item.dataset.name, item.dataset.info, item.dataset.detailImg);
 
@@ -586,6 +580,52 @@
                     item.style.borderColor = 'var(--accent-gold)';
                     document.getElementById('pool').appendChild(item);
                 }, 300);
+            }
+        }
+
+        function placeItemIntoGrave(itemEl, graveArea, isClone) {
+            itemEl.setAttribute('draggable', 'false');
+            itemEl.classList.add('placed');
+            
+            const imgTag = itemEl.querySelector('img');
+            if (imgTag) {
+                imgTag.src = itemEl.dataset.graveImg;
+            }
+
+            const graveTarget = graveArea.dataset.target;
+
+            // Pokud je to klon (nebo jde o 'both' prvek), zkontrolujeme, zda jde o ženský hrob a případně aplikujeme ženskou pozici
+            if (graveTarget === 'female' && itemEl.dataset.femalePosX) {
+                itemEl.style.left = itemEl.dataset.femalePosX;
+                itemEl.style.top = itemEl.dataset.femalePosY;
+                itemEl.style.setProperty('--item-scale', itemEl.dataset.femaleScale);
+            } else {
+                itemEl.style.left = itemEl.dataset.posX;
+                itemEl.style.top = itemEl.dataset.posY;
+                itemEl.style.setProperty('--item-scale', itemEl.dataset.scale);
+            }
+
+            // Ošetření kliknutí na umístěný prvek (i pro klon)
+            itemEl.addEventListener('click', (e) => {
+                if (itemEl.classList.contains('placed')) {
+                    showInfoModal(itemEl.dataset.name, itemEl.dataset.info, itemEl.dataset.detailImg);
+                }
+            });
+
+            const itemLayer = parseInt(itemEl.dataset.layer);
+            let inserted = false;
+            
+            for (let existingChild of graveArea.children) {
+                const existingLayer = parseInt(existingChild.dataset.layer || 1);
+                if (itemLayer < existingLayer) {
+                    graveArea.insertBefore(itemEl, existingChild);
+                    inserted = true;
+                    break;
+                }
+            }
+            
+            if (!inserted) {
+                graveArea.appendChild(itemEl);
             }
         }
 
