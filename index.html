@@ -204,11 +204,11 @@
             width: 100%;
         }
 
-        /* Předmět v hrobě - velikost v % vůči hrobu, aby se škáloval na libovolném zařízení */
+        /* Předmět v hrobě - výška i šířka relativně k velikosti hrobu pro 100% responzivitu */
         .grave-area .item {
             position: absolute;
-            width: 10%;
-            height: 10%;
+            width: 15%;
+            height: 15%;
             min-width: unset;
             background-color: transparent;
             border: none;
@@ -381,7 +381,7 @@
 
     <script>
         const itemsData = [
-            // Mužské předměty
+            // Mužské předměty (přepočítaná měřítka scale pro responzivní poměr vůči ploše hrobu)
             { id: 'mec', name: 'Železný meč', img: 'mec.png', poolImg: 'mec.png', target: 'male', posX: '38%', posY: '60%', scale: 2.8, info: 'Popis popis.', layer: 1, detailImg: 'mec.png' },
             { id: 'opasek-muz', name: 'Železný opasek', img: 'opasek-muz.png', poolImg: 'opasek-muz.png', target: 'male', posX: '50%', posY: '48%', scale: 1.6, info: 'Test 4 popis po vložení opasku.', layer: 2 },
             { id: 'stit', name: 'Štít', img: 'stit.png', poolImg: 'stit.png', target: 'male', posX: '63%', posY: '50%', scale: 3.5, info: 'Test 2 popis po vložení štítu.', layer: 3, detailImg: 'stit.png' },
@@ -453,7 +453,7 @@
                     e.dataTransfer.setData('text/plain', el.id);
                 });
 
-                // Dotyk (Mobil / Tablet)
+                // Dotyk (Mobil / Tablet / Kiosek)
                 el.addEventListener('touchstart', (e) => {
                     if (el.classList.contains('placed')) return;
                     draggedItem = el;
