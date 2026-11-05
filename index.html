@@ -23,20 +23,35 @@
 
         body {
             margin: 0;
-            padding: 15px;
+            padding: 0;
             background-color: var(--bg-color);
             color: var(--text-light);
             font-family: 'Segoe UI', Arial, sans-serif;
+            width: 100vw;
             height: 100vh;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             overflow: hidden;
+        }
+
+        /* Obalení celé hry na pevný základ, který se bude automaticky škálovat podle obrazovky kiosku */
+        .game-wrapper {
+            width: 1280px;
+            height: 720px;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            background-color: var(--bg-color);
+            position: relative;
+            transform-origin: center center;
         }
 
         header {
             text-align: center;
             margin-bottom: 10px;
             position: relative;
+            flex-shrink: 0;
         }
 
         header h1 {
@@ -204,11 +219,11 @@
             width: 100%;
         }
 
-        /* Předmět v hrobě - pevný čtvercový základ škálovaný podle šířky hrobu, zachovává původní poměry */
+        /* Předmět v hrobě - přesný původní pixelový základ z tvého PC */
         .grave-area .item {
             position: absolute;
-            width: 12%;
-            aspect-ratio: 1 / 1;
+            width: 60px;
+            height: 60px;
             min-width: unset;
             background-color: transparent;
             border: none;
@@ -318,44 +333,35 @@
             cursor: pointer;
             margin-top: 15px;
         }
-
-        /* Speciální úprava pouze pro mobily/tablety, aby fungoval horizontální posun a zoom nad hroby */
-        @media (max-width: 1150px) {
-            body {
-                overflow-x: auto;
-                overflow-y: auto;
-            }
-            .main-layout {
-                min-width: 1100px;
-            }
-        }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Sestav keltský hrob</h1>
-        <p>Přetáhni artefakty do správného hrobu</p>
-        <button class="restart-btn" onclick="resetGame()">Začít znovu</button>
-    </header>
+    <div class="game-wrapper" id="gameWrapper">
+        <header>
+            <h1>Sestav keltský hrob</h1>
+            <p>Přetáhni artefakty do správného hrobu</p>
+            <button class="restart-btn" onclick="resetGame()">Začít znovu</button>
+        </header>
 
-    <div class="main-layout">
-        <!-- Hroby vlevo -->
-        <div class="game-board">
-            <div class="grave-container">
-                <h2>Mužský hrob (Válečník)</h2>
-                <div class="grave-area" id="male-grave" data-target="male"></div>
+        <div class="main-layout">
+            <!-- Hroby vlevo -->
+            <div class="game-board">
+                <div class="grave-container">
+                    <h2>Mužský hrob (Válečník)</h2>
+                    <div class="grave-area" id="male-grave" data-target="male"></div>
+                </div>
+                <div class="grave-container">
+                    <h2>Ženský hrob</h2>
+                    <div class="grave-area" id="female-grave" data-target="female"></div>
+                </div>
             </div>
-            <div class="grave-container">
-                <h2>Ženský hrob</h2>
-                <div class="grave-area" id="female-grave" data-target="female"></div>
-            </div>
-        </div>
 
-        <!-- Zásobník prvků vpravo -->
-        <div class="inventory-panel">
-            <h3>Nalezené artefakty:</h3>
-            <div class="items-pool" id="pool"></div>
+            <!-- Zásobník prvků vpravo -->
+            <div class="inventory-panel">
+                <h3>Nalezené artefakty:</h3>
+                <div class="items-pool" id="pool"></div>
+            </div>
         </div>
     </div>
 
@@ -380,6 +386,25 @@
     </div>
 
     <script>
+        // Automatické škálování celé hry podle velikosti obrazovky (ideální pro muzejní dotykové kiosky)
+        function scaleGame() {
+            const wrapper = document.getElementById('gameWrapper');
+            const targetWidth = 1280;
+            const targetHeight = 720;
+            
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            
+            const scaleX = windowWidth / targetWidth;
+            const scaleY = windowHeight / targetHeight;
+            const scale = Math.min(scaleX, scaleY);
+            
+            wrapper.style.transform = `scale(${scale})`;
+        }
+
+        window.addEventListener('resize', scaleGame);
+        window.addEventListener('DOMContentLoaded', scaleGame);
+
         const itemsData = [
             // Mužské předměty
             { id: 'mec', name: 'Železný meč', img: 'mec.png', poolImg: 'mec.png', target: 'male', posX: '38%', posY: '60%', scale: 2.8, info: 'Popis popis.', layer: 1, detailImg: 'mec.png' },
